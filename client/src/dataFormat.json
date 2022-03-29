@@ -1,0 +1,11 @@
+{
+  "bodyShop": true,
+  "majorService": true,
+  "detail": true,
+  "photos": true,
+  "description": true,
+  "gas": true,
+  "safetyCheck": true,
+  "stickers": true,
+  "priceTag": true
+}

@@ -1,0 +1,25 @@
+.main-grid {
+  border: 2px solid blue;
+}
+
+.expanding-module {
+  border: 2px solid green;
+  cursor: pointer;
+  width: 350px;
+
+  &-expanded {
+    height: 600px;
+  }
+}
+
+.hidden {
+  display: none !important;
+}
+
+.half-width {
+  width: 45%;
+}
+
+.full-width {
+  width: 100%;
+}
