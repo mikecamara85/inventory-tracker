@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import dataFormat from "./dataFormat";
+import axios from "axios";
 import "./App.scss";
 
 function App() {
@@ -18,7 +18,21 @@ function App() {
 
   const loadInventory = async () => {
     try {
-      const localVehicleData = dataFormat;
+      const res = await axios.post(
+        "/api/v1/vehicle/get-vehicle-data",
+        {},
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (!res || !res.data || !res.data.success) {
+        throw new Error("could not get vehicle data from database");
+      }
+
+      const localVehicleData = res.data.vehicleData;
 
       localVehicleData.forEach((v, index) => {
         let stepsNeeded = 0;

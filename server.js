@@ -32,8 +32,7 @@ app.use(
   })
 );
 
-// app.use("/api/user", userRoutes);
-// app.use("/api/email", emailRoutes);
+app.use("/api/v1/vehicle", vehicleRoutes);
 
 // Serve static assets in production
 if (process.env.NODE_ENV === "production") {
