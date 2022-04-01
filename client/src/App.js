@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import vehicleData from "./dataFormat";
 import axios from "axios";
 import "./App.scss";
 
