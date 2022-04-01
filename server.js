@@ -9,7 +9,7 @@ const cookieParser = require("cookie-parser");
 const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
 const app = express();
-// const userRoutes = require("./routes/userRoutes");
+const vehicleRoutes = require("./routes/vehicleRoutes");
 // const emailRoutes = require("./routes/emailRoutes");
 
 // Init Middleware

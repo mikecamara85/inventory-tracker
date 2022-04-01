@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
 mongoose.connect(
-  `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@cluster0.zhs2r.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`
+  `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@cluster0.zhs2r.mongodb.net/inventory-tracker?retryWrites=true&w=majority`
 );
 
 const db = mongoose.connection;

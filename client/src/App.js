@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import vehicleData from "./dataFormat";
+// import vehicleData from "./dataFormat";
 import axios from "axios";
 import "./App.scss";
 
@@ -84,11 +84,17 @@ function App() {
           if (stepsCompleted / stepsNeeded < 0.5) {
             v["severity"] = "danger";
           } else if (
-            stepsCompleted / stepsNeeded < 0.9 &&
+            stepsCompleted / stepsNeeded <= 0.9 &&
             stepsCompleted / stepsNeeded >= 0.5
           ) {
             v["severity"] = "warning";
           } else {
+            console.log(
+              v,
+              stepsCompleted,
+              stepsNeeded,
+              stepsCompleted / stepsNeeded
+            );
             v["severity"] = "ready";
           }
 
