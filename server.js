@@ -3,7 +3,7 @@ const express = require("express");
 require("dotenv").config({
   path: path.resolve(process.cwd(), "config.env"),
 });
-// require("./util/db");
+require("./util/db");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const helmet = require("helmet");

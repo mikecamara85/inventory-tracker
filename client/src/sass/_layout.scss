@@ -3,13 +3,56 @@
 }
 
 .expanding-module {
-  border: 2px solid green;
+  border: 2px solid black;
+  border-radius: 10px;
+  color: white;
   cursor: pointer;
   width: 350px;
+  text-align: center;
+  padding: 0.5rem;
+  margin: 0.5rem;
 
   &-expanded {
-    height: 600px;
+    color: black !important;
+    background-color: white !important;
+    padding-bottom: 2rem;
   }
+
+  &-selected {
+    color: black !important;
+    background-color: white !important;
+  }
+
+  &-danger {
+    background-color: orangered;
+
+    color: white;
+  }
+
+  &-defcon {
+    background-color: red;
+    color: white;
+  }
+
+  &-warning {
+    background-color: yellow;
+
+    color: black;
+  }
+
+  &-ready {
+    background-color: green;
+
+    color: white;
+  }
+}
+
+.selected-row {
+  margin: 0.5rem 0rem;
+}
+
+select {
+  margin: 0.5rem 0rem;
 }
 
 .hidden {
@@ -22,4 +65,17 @@
 
 .full-width {
   width: 100%;
+}
+
+.ninety-width {
+  width: 90%;
+}
+
+.note-viewer {
+  min-height: 200px;
+  border: 2px solid black;
+}
+
+.note-composer {
+  min-height: 150px;
 }
