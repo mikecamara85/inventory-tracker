@@ -10,10 +10,17 @@ function App() {
   const [inventoryLoaded, setInventoryLoaded] = useState(false);
   const [vehicleData, setVehicleData] = useState([]);
 
+  const axiosConfig = {
+    headers: {
+      "Content-Type": "application/json",
+    },
+  };
+
   useEffect(() => {
     if (!inventoryLoaded) {
       loadInventory();
     }
+    // eslint-disable-next-line
   }, [inventoryLoaded]);
   //
 
@@ -22,11 +29,7 @@ function App() {
       const res = await axios.post(
         "/api/v1/vehicle/get-vehicle-data",
         {},
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
+        axiosConfig
       );
 
       if (!res || !res.data || !res.data.success) {
@@ -36,69 +39,30 @@ function App() {
       const localVehicleData = res.data.vehicleData;
 
       localVehicleData.forEach((v, index) => {
-        let stepsNeeded = 0;
-
-        for (let key in v) {
-          if (
-            key !== "year" &&
-            key !== "make" &&
-            key !== "model" &&
-            key !== "stock"
-          ) {
-            if (typeof v[key] === "string" && v[key] !== "not-needed") {
-              // if (index === 0) {
-              //   console.log("step needed: ", key, v[key]);
-              // }
-
-              stepsNeeded++;
-            }
-          }
-        }
-
-        let stepsCompleted = 0;
-
-        for (let key in v) {
-          if (
-            key !== "year" &&
-            key !== "make" &&
-            key !== "model" &&
-            key !== "stock"
-          ) {
-            if (
-              typeof v[key] === "string" &&
-              v[key] !== "not-done" &&
-              v[key] !== "not-needed"
-            ) {
-              // if (index === 0) {
-              //   console.log("step completed:", key, v[key]);
-              // }
-
-              stepsCompleted++;
-            }
-          }
-        }
-
-        if (stepsCompleted > stepsNeeded) {
-          throw new Error("steps completed is greater than steps needed...");
+        if (v.bodyShop === "not-done" || v.majorService === "not-done") {
+          v["severity"] = "danger";
+        } else if (
+          v.detail === "not-done" ||
+          v.photos === "not-done" ||
+          v.description === "not-done" ||
+          v.gas === "not-done" ||
+          v.safetyCheck === "not-done" ||
+          v.stickers === "not-done" ||
+          v.priceTag === "not-done"
+        ) {
+          v["severity"] = "warning";
         } else {
-          if (stepsCompleted / stepsNeeded < 0.5) {
-            v["severity"] = "danger";
-          } else if (
-            stepsCompleted / stepsNeeded <= 0.9 &&
-            stepsCompleted / stepsNeeded >= 0.5
-          ) {
-            v["severity"] = "warning";
-          } else {
-            console.log(
-              v,
-              stepsCompleted,
-              stepsNeeded,
-              stepsCompleted / stepsNeeded
-            );
-            v["severity"] = "ready";
-          }
+          v["severity"] = "ready";
+        }
 
-          if (v["severity"] !== "ready" && v["isSold"] === true) {
+        if (v.severity !== "ready" && v.isSold) {
+          if (
+            v.bodyShop === "not-done" ||
+            v.majorService === "not-done" ||
+            v.detail === "not-done" ||
+            v.gas === "not-done" ||
+            v.safetyCheck === "not-done"
+          ) {
             v["severity"] = "defcon";
           }
         }
@@ -154,6 +118,31 @@ function App() {
       <div className="row d-flex justify-content-center m-5 large-text">
         Inventory Tracker
       </div>
+      <div className="d-flex justify-content-center">
+        <button
+          className="medium-text m-3"
+          onClick={() => {
+            const answer = prompt("enter stock number to delete").toLowerCase();
+
+            (async function () {
+              const res = await axios.post(
+                "/api/v1/vehicle/delete-vehicle",
+                { answer },
+                axiosConfig
+              );
+
+              console.log(res);
+
+              window.location.reload();
+            })();
+          }}
+        >
+          Delete Vehicle
+        </button>
+        <button className="medium-text m-3" onClick={() => {}}>
+          Add Vehicle
+        </button>
+      </div>
       <div
         className="row d-flex justify-content-center mb-5 hidden"
         ref={selectedModule}
@@ -176,11 +165,28 @@ function App() {
               className="small-text half-width center-text "
               value={currentVehicle ? currentVehicle.bodyShop : ""}
               onChange={(e) => {
-                setCurrentVehicle({
-                  ...currentVehicle,
-                  bodyShop: e.currentTarget.value,
-                });
-                setInventoryLoaded(false);
+                const bodyShop = e.currentTarget.value;
+                (async function () {
+                  const res = await axios.post(
+                    "/api/v1/vehicle/update-vehicle",
+                    {
+                      currentVehicle: currentVehicle ? currentVehicle : null,
+                      bodyShop,
+                    },
+                    axiosConfig
+                  );
+
+                  if (res.data.success) {
+                    setCurrentVehicle({
+                      ...currentVehicle,
+                      bodyShop,
+                    });
+                    setInventoryLoaded(false);
+                  } else {
+                    alert("could not update database...");
+                    window.location.reload();
+                  }
+                })();
               }}
             >
               <option value="done">done</option>
@@ -196,11 +202,28 @@ function App() {
               className="small-text half-width center-text "
               value={currentVehicle ? currentVehicle.majorService : ""}
               onChange={(e) => {
-                setCurrentVehicle({
-                  ...currentVehicle,
-                  majorService: e.currentTarget.value,
-                });
-                setInventoryLoaded(false);
+                const majorService = e.currentTarget.value;
+                (async function () {
+                  const res = await axios.post(
+                    "/api/v1/vehicle/update-vehicle",
+                    {
+                      currentVehicle: currentVehicle ? currentVehicle : null,
+                      majorService,
+                    },
+                    axiosConfig
+                  );
+
+                  if (res.data.success) {
+                    setCurrentVehicle({
+                      ...currentVehicle,
+                      majorService,
+                    });
+                    setInventoryLoaded(false);
+                  } else {
+                    alert("could not update database...");
+                    window.location.reload();
+                  }
+                })();
               }}
             >
               <option value="done">done</option>
@@ -216,11 +239,28 @@ function App() {
               className="small-text half-width center-text "
               value={currentVehicle ? currentVehicle.detail : ""}
               onChange={(e) => {
-                setCurrentVehicle({
-                  ...currentVehicle,
-                  detail: e.currentTarget.value,
-                });
-                setInventoryLoaded(false);
+                const detail = e.currentTarget.value;
+                (async function () {
+                  const res = await axios.post(
+                    "/api/v1/vehicle/update-vehicle",
+                    {
+                      currentVehicle: currentVehicle ? currentVehicle : null,
+                      detail,
+                    },
+                    axiosConfig
+                  );
+
+                  if (res.data.success) {
+                    setCurrentVehicle({
+                      ...currentVehicle,
+                      detail,
+                    });
+                    setInventoryLoaded(false);
+                  } else {
+                    alert("could not update database...");
+                    window.location.reload();
+                  }
+                })();
               }}
             >
               <option value="done">done</option>
@@ -236,11 +276,28 @@ function App() {
               className="small-text half-width center-text "
               value={currentVehicle ? currentVehicle.photos : ""}
               onChange={(e) => {
-                setCurrentVehicle({
-                  ...currentVehicle,
-                  photos: e.currentTarget.value,
-                });
-                setInventoryLoaded(false);
+                const photos = e.currentTarget.value;
+                (async function () {
+                  const res = await axios.post(
+                    "/api/v1/vehicle/update-vehicle",
+                    {
+                      currentVehicle: currentVehicle ? currentVehicle : null,
+                      photos,
+                    },
+                    axiosConfig
+                  );
+
+                  if (res.data.success) {
+                    setCurrentVehicle({
+                      ...currentVehicle,
+                      photos,
+                    });
+                    setInventoryLoaded(false);
+                  } else {
+                    alert("could not update database...");
+                    window.location.reload();
+                  }
+                })();
               }}
             >
               <option value="done">done</option>
@@ -256,11 +313,28 @@ function App() {
               className="small-text half-width center-text "
               value={currentVehicle ? currentVehicle.description : ""}
               onChange={(e) => {
-                setCurrentVehicle({
-                  ...currentVehicle,
-                  description: e.currentTarget.value,
-                });
-                setInventoryLoaded(false);
+                const description = e.currentTarget.value;
+                (async function () {
+                  const res = await axios.post(
+                    "/api/v1/vehicle/update-vehicle",
+                    {
+                      currentVehicle: currentVehicle ? currentVehicle : null,
+                      description,
+                    },
+                    axiosConfig
+                  );
+
+                  if (res.data.success) {
+                    setCurrentVehicle({
+                      ...currentVehicle,
+                      description,
+                    });
+                    setInventoryLoaded(false);
+                  } else {
+                    alert("could not update database...");
+                    window.location.reload();
+                  }
+                })();
               }}
             >
               <option value="done">done</option>
@@ -276,11 +350,28 @@ function App() {
               className="small-text half-width center-text "
               value={currentVehicle ? currentVehicle.gas : ""}
               onChange={(e) => {
-                setCurrentVehicle({
-                  ...currentVehicle,
-                  gas: e.currentTarget.value,
-                });
-                setInventoryLoaded(false);
+                const gas = e.currentTarget.value;
+                (async function () {
+                  const res = await axios.post(
+                    "/api/v1/vehicle/update-vehicle",
+                    {
+                      currentVehicle: currentVehicle ? currentVehicle : null,
+                      gas,
+                    },
+                    axiosConfig
+                  );
+
+                  if (res.data.success) {
+                    setCurrentVehicle({
+                      ...currentVehicle,
+                      gas,
+                    });
+                    setInventoryLoaded(false);
+                  } else {
+                    alert("could not update database...");
+                    window.location.reload();
+                  }
+                })();
               }}
             >
               <option value="done">done</option>
@@ -296,11 +387,28 @@ function App() {
               className="small-text half-width center-text "
               value={currentVehicle ? currentVehicle.safetyCheck : ""}
               onChange={(e) => {
-                setCurrentVehicle({
-                  ...currentVehicle,
-                  safetyCheck: e.currentTarget.value,
-                });
-                setInventoryLoaded(false);
+                const safetyCheck = e.currentTarget.value;
+                (async function () {
+                  const res = await axios.post(
+                    "/api/v1/vehicle/update-vehicle",
+                    {
+                      currentVehicle: currentVehicle ? currentVehicle : null,
+                      safetyCheck,
+                    },
+                    axiosConfig
+                  );
+
+                  if (res.data.success) {
+                    setCurrentVehicle({
+                      ...currentVehicle,
+                      safetyCheck,
+                    });
+                    setInventoryLoaded(false);
+                  } else {
+                    alert("could not update database...");
+                    window.location.reload();
+                  }
+                })();
               }}
             >
               <option value="done">done</option>
@@ -316,11 +424,28 @@ function App() {
               className="small-text half-width center-text "
               value={currentVehicle ? currentVehicle.stickers : ""}
               onChange={(e) => {
-                setCurrentVehicle({
-                  ...currentVehicle,
-                  stickers: e.currentTarget.value,
-                });
-                setInventoryLoaded(false);
+                const stickers = e.currentTarget.value;
+                (async function () {
+                  const res = await axios.post(
+                    "/api/v1/vehicle/update-vehicle",
+                    {
+                      currentVehicle: currentVehicle ? currentVehicle : null,
+                      stickers,
+                    },
+                    axiosConfig
+                  );
+
+                  if (res.data.success) {
+                    setCurrentVehicle({
+                      ...currentVehicle,
+                      stickers,
+                    });
+                    setInventoryLoaded(false);
+                  } else {
+                    alert("could not update database...");
+                    window.location.reload();
+                  }
+                })();
               }}
             >
               <option value="done">done</option>
@@ -336,11 +461,28 @@ function App() {
               className="small-text half-width center-text "
               value={currentVehicle ? currentVehicle.priceTag : ""}
               onChange={(e) => {
-                setCurrentVehicle({
-                  ...currentVehicle,
-                  priceTag: e.currentTarget.value,
-                });
-                setInventoryLoaded(false);
+                const priceTag = e.currentTarget.value;
+                (async function () {
+                  const res = await axios.post(
+                    "/api/v1/vehicle/update-vehicle",
+                    {
+                      currentVehicle: currentVehicle ? currentVehicle : null,
+                      priceTag,
+                    },
+                    axiosConfig
+                  );
+
+                  if (res.data.success) {
+                    setCurrentVehicle({
+                      ...currentVehicle,
+                      priceTag,
+                    });
+                    setInventoryLoaded(false);
+                  } else {
+                    alert("could not update database...");
+                    window.location.reload();
+                  }
+                })();
               }}
             >
               <option value="done">done</option>
@@ -356,11 +498,28 @@ function App() {
               className="small-text half-width center-text "
               value={currentVehicle ? currentVehicle.isSold : false}
               onChange={(e) => {
-                setCurrentVehicle({
-                  ...currentVehicle,
-                  isSold: e.currentTarget.value,
-                });
-                setInventoryLoaded(false);
+                const isSold = e.currentTarget.value;
+                (async function () {
+                  const res = await axios.post(
+                    "/api/v1/vehicle/update-vehicle",
+                    {
+                      currentVehicle: currentVehicle ? currentVehicle : null,
+                      isSold,
+                    },
+                    axiosConfig
+                  );
+
+                  if (res.data.success) {
+                    setCurrentVehicle({
+                      ...currentVehicle,
+                      isSold,
+                    });
+                    setInventoryLoaded(false);
+                  } else {
+                    alert("could not update database...");
+                    window.location.reload();
+                  }
+                })();
               }}
             >
               <option value={true}>true</option>
@@ -440,6 +599,10 @@ function App() {
             </div>
           );
         })}
+      </div>
+      <div className="popup">
+        <div>this is one row</div>
+        <div>this is another row</div>
       </div>
     </div>
   );
