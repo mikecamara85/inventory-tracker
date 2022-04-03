@@ -21,7 +21,6 @@ const vehicleSchema = mongoose.Schema(
     stock: {
       type: String,
       required: [true, "A vehicle must have a stock number!"],
-      unique: true,
       lowercase: true,
     },
     bodyShop: {

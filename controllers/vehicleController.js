@@ -7,6 +7,7 @@ exports.deleteVehicle = async (req, res, next) => {
       throw new Error("did not receive answer from front end");
     }
 
+    // here, the req is also going to have to contain the dealership and the user
     const vehicle = await Vehicle.find({ stock: req.body.answer });
 
     if (!vehicle[0]) {

@@ -13,7 +13,7 @@ const userSchema = mongoose.Schema(
     },
     password: {
       type: String,
-      required: [true, "a User must have a passWord"],
+      required: [true, "a User must have a password"],
     },
     dealership: {
       type: mongoose.Schema.Types.ObjectId,
