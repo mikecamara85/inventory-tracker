@@ -5,6 +5,13 @@
   margin: auto;
   top: 0px;
   left: 0px;
-  height: 90vh;
+  height: 100vh;
   width: 100vw;
+  max-width: 400px;
+  padding: 2rem;
+}
+
+.field-input {
+  max-width: 225px;
+  width: 100%;
 }

@@ -1,5 +1,78 @@
 const Vehicle = require("../models/Vehicle");
 
+exports.deleteVehicle = async (req, res, next) => {
+  try {
+    console.log("hello from the server");
+    if (!req.body.answer) {
+      throw new Error("did not receive answer from front end");
+    }
+
+    const vehicle = await Vehicle.find({ stock: req.body.answer });
+
+    if (!vehicle[0]) {
+      console.log("not found in database");
+      throw new Error("stock not found in database");
+    } else if (vehicle[1]) {
+      console.log(
+        "this vehicle has a duplicate in the database - find out how this happened"
+      );
+    } else {
+      console.log("found in database");
+      const deleted = await Vehicle.findByIdAndDelete(vehicle[0]._id);
+
+      if (deleted) {
+        res.status(200).send({
+          success: true,
+        });
+      } else {
+        throw new Error("could not delete from database");
+      }
+    }
+  } catch (error) {
+    res.status(400).send({
+      success: false,
+    });
+  }
+};
+//
+exports.enterVehicle = async (req, res, next) => {
+  try {
+    if (!req.body.vehicleToEnter) {
+      throw new Error("did not receive vehicle to enter from front end");
+    }
+
+    const receivedVehicle = req.body.vehicleToEnter;
+
+    await Vehicle.create({
+      year: receivedVehicle.enteredYear,
+      make: receivedVehicle.enteredMake,
+      model: receivedVehicle.enteredModel,
+      stock: receivedVehicle.enteredStock,
+      bodyShop: receivedVehicle.enteredBodyShop,
+      majorService: receivedVehicle.enteredMajorService,
+      detail: receivedVehicle.enteredDetail,
+      photos: receivedVehicle.enteredPhotos,
+      description: receivedVehicle.enteredDescription,
+      gas: receivedVehicle.enteredGas,
+      safetyCheck: receivedVehicle.enteredSafetyCheck,
+      stickers: receivedVehicle.enteredStickers,
+      priceTag: receivedVehicle.enteredPriceTag,
+      isSold: receivedVehicle.enteredIsSold,
+      notes: receivedVehicle.notes,
+    }).catch((err) => {
+      console.log(err);
+    });
+
+    res.status(200).send({
+      success: true,
+    });
+  } catch (error) {
+    res.status(400).send({
+      success: false,
+    });
+  }
+};
+//
 exports.getVehicleData = async (req, res, next) => {
   try {
     const vehicleData = await Vehicle.find();
@@ -14,7 +87,7 @@ exports.getVehicleData = async (req, res, next) => {
     });
   }
 };
-
+//
 exports.updateVehicle = async (req, res, next) => {
   try {
     if (!req.body.currentVehicle) {
@@ -66,37 +139,6 @@ exports.updateVehicle = async (req, res, next) => {
     res.status(200).send({
       success: true,
     });
-  } catch (error) {
-    res.status(400).send({
-      success: false,
-    });
-  }
-};
-
-exports.deleteVehicle = async (req, res, next) => {
-  try {
-    console.log("hello from the server");
-    if (!req.body.answer) {
-      throw new Error("did not receive answer from front end");
-    }
-
-    const vehicle = await Vehicle.find({ stock: req.body.answer });
-
-    if (!vehicle[0]) {
-      console.log("not found in database");
-      throw new Error("stock not found in database");
-    } else {
-      console.log("found in database");
-      const deleted = await Vehicle.findByIdAndDelete(vehicle[0]._id);
-
-      if (deleted) {
-        res.status(200).send({
-          success: true,
-        });
-      } else {
-        throw new Error("could not delete from database");
-      }
-    }
   } catch (error) {
     res.status(400).send({
       success: false,
