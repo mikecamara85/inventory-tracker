@@ -2,6 +2,10 @@ const mongoose = require("mongoose");
 
 const vehicleSchema = mongoose.Schema(
   {
+    dealership: {
+      type: mongoose.Schema.Types.ObjectId,
+      required: [true, "A vehicle must belong to a dealership!"],
+    },
     year: {
       type: String,
       required: [true, "A vehicle must have a model year!"],
