@@ -41,7 +41,7 @@ const Landing = () => {
 
             if (res.data.success) {
               console.log("success!");
-              localStorage.token = res.data.token;
+              localStorage.setItem("token", res.data.token);
               navigate("/main");
             }
           })();

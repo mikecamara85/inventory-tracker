@@ -7,6 +7,7 @@ console.log("user routes reached");
 
 router.post("/create-user", userController.createUser);
 router.post("/login", authController.login);
+router.post("/logout", authController.logout);
 router.post("/checkJWT", authController.checkJWT);
 
 module.exports = router;

@@ -6,7 +6,7 @@ exports.createDealership = async (req, res, next) => {
       throw new Error(err);
     });
 
-    console.log(newDealership);
+    // console.log(newDealership);
 
     res.status(200).send({
       success: true,

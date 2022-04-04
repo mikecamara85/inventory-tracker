@@ -3,19 +3,20 @@ import axios from "axios";
 import axiosConfig from "../util/axiosConfig";
 
 export const checkAuthenticated = async () => {
-  if (localStorage.token) {
-    setAuthToken(localStorage.token);
+  if (localStorage.getItem("token")) {
+    // console.log(localStorage.getItem("token"));
+    setAuthToken(localStorage.getItem("token"));
   }
 
   try {
     let { data } = await axios.post("/api/v1/user/checkJWT", axiosConfig);
     if (data.success) {
-      localStorage.token = data.token;
-      localStorage.userId = data.userId;
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("userId", data.userId);
       return true;
     } else {
-      localStorage.token = "";
-      localStorage.userId = "";
+      localStorage.setItem("token", "");
+      localStorage.setItem("userId", "");
       return false;
     }
   } catch (error) {

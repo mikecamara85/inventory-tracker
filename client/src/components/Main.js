@@ -47,7 +47,7 @@ function Main() {
   //
   useEffect(() => {
     if (!authenticated) {
-      console.log("not authenticated, run async");
+      // console.log("not authenticated, run async");
       (async function () {
         const success = await checkAuthenticated();
 
@@ -84,7 +84,7 @@ function Main() {
 
       const localVehicleData = res.data.vehicleData;
 
-      console.log(localVehicleData);
+      // console.log(localVehicleData);
 
       localVehicleData.forEach((v, index) => {
         if (v.bodyShop === "not-done" || v.majorService === "not-done") {
@@ -739,6 +739,28 @@ function Main() {
             <span style={{ color: "green" }}>$$$</span>!
           </button>
         </div>
+        <div className="d-flex justify-content-center align-items-center small-text m-3">
+          <button
+            className="medium-text"
+            onClick={() => {
+              (async function () {
+                const res = await axios.post(
+                  "/api/v1/user/logout",
+                  { userId: localStorage.getItem("userId") },
+                  axiosConfig
+                );
+
+                if (res.data.success) {
+                  localStorage.setItem("token", "");
+                  localStorage.setItem("userId", "");
+                  window.location.reload();
+                }
+              })();
+            }}
+          >
+            Logout
+          </button>
+        </div>
       </div>
 
       <div className="popup hidden">
@@ -981,7 +1003,7 @@ function Main() {
                 (async function () {
                   const res = await axios.post(
                     "/api/v1/vehicle/enter-vehicle",
-                    { vehicleToEnter, userId: localStorage.userId },
+                    { vehicleToEnter, userId: localStorage.getItem("userId") },
                     axiosConfig
                   );
 

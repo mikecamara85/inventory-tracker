@@ -73,7 +73,7 @@ exports.login = async (req, res, next) => {
   if (!correctPassword) {
     throw new Error(`password ${password} is incorrect...`);
   } else {
-    console.log(user);
+    // console.log(user);
 
     const dealership = await Dealership.findById(user.dealership);
 
@@ -143,4 +143,13 @@ exports.checkJWT = async (req, res, next) => {
       success: false,
     });
   }
+};
+
+exports.logout = (req, res, next) => {
+  res.cookie("jwt", "loggedout", {
+    expires: new Date(Date.now() + 10 * 1000),
+    httpOnly: true,
+    secure: req.secure || req.headers["x-forwarded-proto"] === "https",
+  });
+  res.status(200).json({ success: true });
 };

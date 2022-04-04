@@ -5,7 +5,7 @@ const authController = require("./authController");
 exports.createUser = async (req, res, next) => {
   try {
     const newUser = await User.create(req.body);
-    console.log("New User Created: ", newUser);
+    // console.log("New User Created: ", newUser);
     newUser.password = null;
 
     const dealership = await Dealership.findOne({ _id: req.body.dealership });
