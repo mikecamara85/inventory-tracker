@@ -24,7 +24,7 @@ const PrivateRoute = ({ component: Component, ...rest }) => {
 
   return (
     <Fragment>
-      {!authenticated && !loading && <Navigate to="/login-part-one" />}
+      {!authenticated && !loading && <Navigate to="/" />}
       {!authenticated && (
         <div className="full-page-center full-page-center-with-navbar">
           <div className="lds-dual-ring"></div>

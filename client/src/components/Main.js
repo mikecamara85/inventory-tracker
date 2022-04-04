@@ -1,8 +1,12 @@
 import React, { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import axiosConfig from "../util/axiosConfig";
+import { checkAuthenticated } from "../functions/authFunctions";
 
 function Main() {
+  const navigate = useNavigate();
+
   const bodyShopInput = useRef();
   const descriptionInput = useRef();
   const detailInput = useRef();
@@ -20,6 +24,7 @@ function Main() {
   const stockInput = useRef();
   const yearInput = useRef();
   //
+  const [authenticated, setAuthenticated] = useState(false);
   const [enteredBodyShop, setEnteredBodyShop] = useState("not-needed");
   const [enteredDescription, setEnteredDescription] = useState("not-done");
   const [enteredDetail, setEnteredDetail] = useState("not-done");
@@ -41,6 +46,19 @@ function Main() {
 
   //
   useEffect(() => {
+    if (!authenticated) {
+      console.log("not authenticated, run async");
+      (async function () {
+        const success = await checkAuthenticated();
+
+        if (!success) {
+          navigate("/");
+        } else {
+          setAuthenticated(true);
+        }
+      })();
+    }
+
     if (!inventoryLoaded) {
       loadInventory();
     }
@@ -65,6 +83,8 @@ function Main() {
       }
 
       const localVehicleData = res.data.vehicleData;
+
+      console.log(localVehicleData);
 
       localVehicleData.forEach((v, index) => {
         if (v.bodyShop === "not-done" || v.majorService === "not-done") {
@@ -961,7 +981,7 @@ function Main() {
                 (async function () {
                   const res = await axios.post(
                     "/api/v1/vehicle/enter-vehicle",
-                    { vehicleToEnter },
+                    { vehicleToEnter, userId: localStorage.userId },
                     axiosConfig
                   );
 

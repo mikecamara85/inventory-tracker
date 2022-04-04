@@ -10,7 +10,8 @@ const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
 const app = express();
 const vehicleRoutes = require("./routes/vehicleRoutes");
-// const emailRoutes = require("./routes/emailRoutes");
+const userRoutes = require("./routes/userRoutes");
+const dealershipRoutes = require("./routes/dealershipRoutes");
 
 // Init Middleware
 app.use(express.json({ inflate: false, limit: "5mb" }));
@@ -33,6 +34,8 @@ app.use(
 );
 
 app.use("/api/v1/vehicle", vehicleRoutes);
+app.use("/api/v1/user", userRoutes);
+app.use("/api/v1/dealership", dealershipRoutes);
 
 // Serve static assets in production
 if (process.env.NODE_ENV === "production") {

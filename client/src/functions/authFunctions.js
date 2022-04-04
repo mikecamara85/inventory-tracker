@@ -10,11 +10,13 @@ export const checkAuthenticated = async () => {
   try {
     let { data } = await axios.post("/api/v1/user/checkJWT", axiosConfig);
     if (data.success) {
-      return {
-        authenticated: true,
-      };
+      localStorage.token = data.token;
+      localStorage.userId = data.userId;
+      return true;
     } else {
-      throw new Error("server unable to verify JWT...");
+      localStorage.token = "";
+      localStorage.userId = "";
+      return false;
     }
   } catch (error) {
     console.log("AuthFunctions.checkAuthenticated: ", error);

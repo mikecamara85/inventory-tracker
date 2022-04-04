@@ -1,3 +1,4 @@
+const User = require("../models/User");
 const Vehicle = require("../models/Vehicle");
 
 exports.deleteVehicle = async (req, res, next) => {
@@ -44,6 +45,8 @@ exports.enterVehicle = async (req, res, next) => {
 
     const receivedVehicle = req.body.vehicleToEnter;
 
+    const user = await User.findById(req.body.userId);
+
     await Vehicle.create({
       year: receivedVehicle.enteredYear,
       make: receivedVehicle.enteredMake,
@@ -60,6 +63,7 @@ exports.enterVehicle = async (req, res, next) => {
       priceTag: receivedVehicle.enteredPriceTag,
       isSold: receivedVehicle.enteredIsSold,
       notes: receivedVehicle.notes,
+      dealership: user.dealership,
     }).catch((err) => {
       console.log(err);
     });
