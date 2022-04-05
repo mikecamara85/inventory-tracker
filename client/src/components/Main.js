@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import axiosConfig from "../util/axiosConfig";
 import { checkAuthenticated } from "../functions/authFunctions";
+import { format } from "date-fns";
 
 function Main() {
   const navigate = useNavigate();
@@ -68,10 +69,12 @@ function Main() {
   const deselector = (e) => {
     setCurrentVehicle(null);
     selectedModule.current.classList.add("hidden");
+    window.location.reload();
   };
   //
   const loadInventory = async () => {
     try {
+      console.log("loading inventory");
       const res = await axios.post(
         "/api/v1/vehicle/get-vehicle-data",
         {},
@@ -284,6 +287,7 @@ function Main() {
               {currentVehicle ? currentVehicle.stock : ""}
             </p>
             <div className="row d-flex justify-content-center full-width  selected-row">
+              {/* {console.log(currentVehicle)} */}
               <p className="small-text mr-5 half-width d-flex align-items-center justify-content-center">
                 Body Shop
               </p>
@@ -292,6 +296,7 @@ function Main() {
                 value={currentVehicle ? currentVehicle.bodyShop : ""}
                 onChange={(e) => {
                   const bodyShop = e.currentTarget.value;
+
                   (async function () {
                     const res = await axios.post(
                       "/api/v1/vehicle/update-vehicle",
@@ -303,10 +308,7 @@ function Main() {
                     );
 
                     if (res.data.success) {
-                      setCurrentVehicle({
-                        ...currentVehicle,
-                        bodyShop,
-                      });
+                      setCurrentVehicle(res.data.vehicle);
                       setInventoryLoaded(false);
                     } else {
                       alert("could not update database...");
@@ -380,10 +382,14 @@ function Main() {
                           );
 
                           if (res.data.success) {
+                            console.log(
+                              "about to set current vehicle to one with updated tech"
+                            );
                             setCurrentVehicle({
                               ...currentVehicle,
                               tech,
                             });
+
                             setInventoryLoaded(false);
                           } else {
                             alert("could not update database...");
@@ -554,7 +560,6 @@ function Main() {
                 <option value="done">Done!</option>
               </select>
             </div>
-
             <div className="row d-flex justify-content-center full-width  selected-row">
               <p className="small-text mr-5 half-width d-flex align-items-center justify-content-center">
                 Stickers
@@ -631,7 +636,7 @@ function Main() {
             </div>
             <div className="row d-flex justify-content-center full-width  selected-row">
               <p className="small-text mr-5 half-width d-flex align-items-center justify-content-center">
-                Sold?
+                Deposit?
               </p>
               <select
                 className="small-text half-width center-text "
@@ -665,51 +670,62 @@ function Main() {
                 <option value={false}>false</option>
               </select>
             </div>
+            <div className="row d-flex justify-content-center full-width  selected-row">
+              <p className="small-text mr-5 half-width d-flex align-items-center justify-content-center">
+                Delivered?
+              </p>
+              <select
+                className="small-text half-width center-text "
+                value={false}
+                onChange={(e) => {
+                  const confirmedDelivered = window.confirm(
+                    "Delivering a vehicle deletes it from the database. Do you want to proceed?"
+                  );
+
+                  if (confirmedDelivered) {
+                    (async function () {
+                      const res = await axios.post(
+                        "/api/v1/vehicle/delete-vehicle",
+                        {
+                          answer: currentVehicle ? currentVehicle.stock : "",
+                        },
+                        axiosConfig
+                      );
+
+                      if (res.data.success) {
+                        window.location.reload();
+                      } else {
+                        alert("could not clear from database");
+                      }
+                    })();
+                  }
+                }}
+              >
+                <option value={true}>true</option>
+                <option value={false}>false</option>
+              </select>
+            </div>
             <div className="d-flex flex-column justify-content-center align-items-center full-width selected-row">
               <p className="small-text m-3 d-flex align-items-center justify-content-center">
                 Note Viewer
               </p>
               <div className="small-text ninety-width  note-viewer">
-                <div className="note d-flex m-3 justify-content-between">
-                  <div className="note-info">
-                    <p>Mike</p>
-                    <p>04/05/2022</p>
-                    <p>2:00pm</p>
-                  </div>
-                  <p className="note-body p-3 ml-3">Note Body</p>
-                </div>
-                <div className="note d-flex m-3 justify-content-between">
-                  <div className="note-info">
-                    <p>Mike</p>
-                    <p>04/05/2022</p>
-                    <p>2:30pm</p>
-                  </div>
-                  <p className="note-body p-3 ml-3">Another Note Body</p>
-                </div>
-                <div className="note d-flex m-3 justify-content-between">
-                  <div className="note-info">
-                    <p>Mike</p>
-                    <p>04/05/2022</p>
-                    <p>2:30pm</p>
-                  </div>
-                  <p className="note-body p-3 ml-3">Another Note Body</p>
-                </div>
-                <div className="note d-flex m-3 justify-content-between">
-                  <div className="note-info">
-                    <p>Mike</p>
-                    <p>04/05/2022</p>
-                    <p>2:30pm</p>
-                  </div>
-                  <p className="note-body p-3 ml-3">Another Note Body</p>
-                </div>
-                <div className="note d-flex m-3 justify-content-between">
-                  <div className="note-info">
-                    <p>Mike</p>
-                    <p>04/05/2022</p>
-                    <p>2:30pm</p>
-                  </div>
-                  <p className="note-body p-3 ml-3">Another Note Body</p>
-                </div>
+                {currentVehicle &&
+                  currentVehicle.notes &&
+                  currentVehicle.notes.length &&
+                  currentVehicle.notes.map((n, idx) => (
+                    <div
+                      className="note d-flex m-3 justify-content-between"
+                      key={idx}
+                    >
+                      <div className="note-info">
+                        <p>{n.name && n.name.split(" ")[0]}</p>
+                        <p>{format(new Date(n.createdAt), "P")}</p>
+                        <p>{format(new Date(n.createdAt), "p")}</p>
+                      </div>
+                      <p className="note-body p-3 ml-3">{n.body}</p>
+                    </div>
+                  ))}
               </div>
             </div>
             <div className="d-flex flex-column justify-content-center align-items-center full-width  selected-row">
@@ -1014,7 +1030,7 @@ function Main() {
           </select>
         </div>
         <div className="small-text d-flex align-items-center justify-content-between mt-3 bg-light">
-          <p className="mr-5">Is Sold:</p>
+          <p className="mr-5">Deposit:</p>
           <select
             className="field-input bg-light"
             ref={isSoldInput}
@@ -1053,11 +1069,6 @@ function Main() {
                   enteredStickers,
                   enteredPriceTag,
                   enteredIsSold,
-                  notes: {
-                    date: "04/03/2022",
-                    user: "Michael Camara",
-                    body: "this is hard coded",
-                  },
                 };
 
                 (async function () {

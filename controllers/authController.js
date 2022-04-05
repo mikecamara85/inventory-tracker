@@ -153,3 +153,47 @@ exports.logout = (req, res, next) => {
   });
   res.status(200).json({ success: true });
 };
+
+exports.protect = async (req, res, next) => {
+  try {
+    // 1: Get token if it exists
+    let token;
+    if (
+      req.headers.authorization &&
+      req.headers.authorization.startsWith("Bearer")
+    ) {
+      token = req.headers.authorization.split(" ")[1];
+    } else if (req.cookies.jwt) {
+      token = req.cookies.jwt;
+    }
+
+    if (!token) {
+      // console.log("authController.protect: User not logged in...");
+    }
+
+    // 2: Verify token
+    const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
+
+    // 3: Check if user still exists
+    const currentUser = await User.findById(decoded.id);
+    if (!currentUser) {
+      // console.log("authController.protect: User not found...");
+    }
+
+    // // 4: Check if user changed password after the token was issued
+    // if (currentUser.changedPasswordAfter(decoded.iat)) {
+    //   // console.log("authController.protect: User recently changed password...");
+    // }
+
+    // 5: ACCESS GRANTED: Attach user to request
+    req.user = currentUser;
+    res.locals.user = currentUser;
+
+    return next();
+  } catch (error) {
+    console.log("authController.protect: ", error.message);
+    res.status(401).send({
+      success: false,
+    });
+  }
+};

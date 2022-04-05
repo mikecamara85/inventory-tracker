@@ -67,7 +67,17 @@ const vehicleSchema = mongoose.Schema(
       type: Boolean,
       default: false,
     },
-    notes: [Object],
+    notes: {
+      type: Array,
+      default: [
+        {
+          name: "Michael Camara",
+          createdAt: new Date(),
+          body: "this note was only created to prevent an Error...",
+          user: mongoose.Schema.Types.ObjectId,
+        },
+      ],
+    },
   },
   { timestamps: true }
 );

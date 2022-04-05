@@ -64,6 +64,14 @@ exports.enterVehicle = async (req, res, next) => {
       isSold: receivedVehicle.enteredIsSold,
       notes: receivedVehicle.notes,
       dealership: user.dealership,
+      notes: [
+        {
+          name: user.name,
+          createdAt: new Date(),
+          user: user._id,
+          body: "Vehicle Created!",
+        },
+      ],
     }).catch((err) => {
       console.log(err);
     });
@@ -99,50 +107,153 @@ exports.updateVehicle = async (req, res, next) => {
       throw new Error("did not receive vehicle from front end");
     }
 
+    let user = null;
+
+    if (!req.user) {
+      throw new Error("auth failed");
+    } else {
+      user = await User.findById(req.user._id).catch((err) => {
+        console.log("could not find user");
+      });
+    }
+
     if (req.body.bodyShop) {
       await Vehicle.findByIdAndUpdate(req.body.currentVehicle._id, {
         bodyShop: req.body.bodyShop,
+        notes: [
+          ...req.body.currentVehicle.notes,
+          {
+            name: user.name,
+            body: `Updated body shop status: ${req.body.bodyShop}`,
+            user: user._id,
+            createdAt: new Date(),
+          },
+        ],
       });
     } else if (req.body.service) {
       await Vehicle.findByIdAndUpdate(req.body.currentVehicle._id, {
         service: req.body.service,
+        notes: [
+          ...req.body.currentVehicle.notes,
+          {
+            name: user.name,
+            body: `Updated service status: ${req.body.service}`,
+            user: user._id,
+            createdAt: new Date(),
+          },
+        ],
       });
     } else if (req.body.tech) {
       await Vehicle.findByIdAndUpdate(req.body.currentVehicle._id, {
         tech: req.body.tech,
+        notes: [
+          ...req.body.currentVehicle.notes,
+          {
+            name: user.name,
+            body: `Updated tech status: ${req.body.tech}`,
+            user: user._id,
+            createdAt: new Date(),
+          },
+        ],
       });
     } else if (req.body.detail) {
       await Vehicle.findByIdAndUpdate(req.body.currentVehicle._id, {
         detail: req.body.detail,
+        notes: [
+          ...req.body.currentVehicle.notes,
+          {
+            name: user.name,
+            body: `Updated detail status: ${req.body.detail}`,
+            user: user._id,
+            createdAt: new Date(),
+          },
+        ],
       });
     } else if (req.body.photos) {
       await Vehicle.findByIdAndUpdate(req.body.currentVehicle._id, {
         photos: req.body.photos,
+        notes: [
+          ...req.body.currentVehicle.notes,
+          {
+            name: user.name,
+            body: `Updated photos status: ${req.body.photos}`,
+            user: user._id,
+            createdAt: new Date(),
+          },
+        ],
       });
     } else if (req.body.description) {
       await Vehicle.findByIdAndUpdate(req.body.currentVehicle._id, {
         description: req.body.description,
+        notes: [
+          ...req.body.currentVehicle.notes,
+          {
+            name: user.name,
+            body: `Updated description status: ${req.body.description}`,
+            user: user._id,
+            createdAt: new Date(),
+          },
+        ],
       });
     } else if (req.body.gas) {
       await Vehicle.findByIdAndUpdate(req.body.currentVehicle._id, {
         gas: req.body.gas,
+        notes: [
+          ...req.body.currentVehicle.notes,
+          {
+            name: user.name,
+            body: `Updated gas status: ${req.body.gas}`,
+            user: user._id,
+            createdAt: new Date(),
+          },
+        ],
       });
     } else if (req.body.stickers) {
       await Vehicle.findByIdAndUpdate(req.body.currentVehicle._id, {
         stickers: req.body.stickers,
+        notes: [
+          ...req.body.currentVehicle.notes,
+          {
+            name: user.name,
+            body: `Updated stickers status: ${req.body.stickers}`,
+            user: user._id,
+            createdAt: new Date(),
+          },
+        ],
       });
     } else if (req.body.priceTag) {
       await Vehicle.findByIdAndUpdate(req.body.currentVehicle._id, {
         priceTag: req.body.priceTag,
+        notes: [
+          ...req.body.currentVehicle.notes,
+          {
+            name: user.name,
+            body: `Updated price tag status: ${req.body.priceTag}`,
+            user: user._id,
+            createdAt: new Date(),
+          },
+        ],
       });
     } else if (req.body.isSold) {
       await Vehicle.findByIdAndUpdate(req.body.currentVehicle._id, {
         isSold: req.body.isSold,
+        notes: [
+          ...req.body.currentVehicle.notes,
+          {
+            name: user.name,
+            body: `Updated deposit status: ${req.body.isSold}`,
+            user: user._id,
+            createdAt: new Date(),
+          },
+        ],
       });
     }
 
+    const updatedVehicle = await Vehicle.findById(req.body.currentVehicle._id);
+
     res.status(200).send({
       success: true,
+      vehicle: updatedVehicle,
     });
   } catch (error) {
     res.status(400).send({
