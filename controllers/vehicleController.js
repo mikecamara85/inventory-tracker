@@ -53,12 +53,12 @@ exports.enterVehicle = async (req, res, next) => {
       model: receivedVehicle.enteredModel,
       stock: receivedVehicle.enteredStock,
       bodyShop: receivedVehicle.enteredBodyShop,
-      majorService: receivedVehicle.enteredMajorService,
+      service: receivedVehicle.enteredService,
+      tech: receivedVehicle.enteredTech,
       detail: receivedVehicle.enteredDetail,
       photos: receivedVehicle.enteredPhotos,
       description: receivedVehicle.enteredDescription,
       gas: receivedVehicle.enteredGas,
-      safetyCheck: receivedVehicle.enteredSafetyCheck,
       stickers: receivedVehicle.enteredStickers,
       priceTag: receivedVehicle.enteredPriceTag,
       isSold: receivedVehicle.enteredIsSold,
@@ -103,9 +103,13 @@ exports.updateVehicle = async (req, res, next) => {
       await Vehicle.findByIdAndUpdate(req.body.currentVehicle._id, {
         bodyShop: req.body.bodyShop,
       });
-    } else if (req.body.majorService) {
+    } else if (req.body.service) {
       await Vehicle.findByIdAndUpdate(req.body.currentVehicle._id, {
-        majorService: req.body.majorService,
+        service: req.body.service,
+      });
+    } else if (req.body.tech) {
+      await Vehicle.findByIdAndUpdate(req.body.currentVehicle._id, {
+        tech: req.body.tech,
       });
     } else if (req.body.detail) {
       await Vehicle.findByIdAndUpdate(req.body.currentVehicle._id, {
@@ -122,10 +126,6 @@ exports.updateVehicle = async (req, res, next) => {
     } else if (req.body.gas) {
       await Vehicle.findByIdAndUpdate(req.body.currentVehicle._id, {
         gas: req.body.gas,
-      });
-    } else if (req.body.safetyCheck) {
-      await Vehicle.findByIdAndUpdate(req.body.currentVehicle._id, {
-        safetyCheck: req.body.safetyCheck,
       });
     } else if (req.body.stickers) {
       await Vehicle.findByIdAndUpdate(req.body.currentVehicle._id, {

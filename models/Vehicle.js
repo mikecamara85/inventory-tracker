@@ -27,9 +27,13 @@ const vehicleSchema = mongoose.Schema(
       type: String,
       default: "not-needed",
     },
-    majorService: {
+    service: {
       type: String,
-      default: "not-needed",
+      default: "not-done",
+    },
+    tech: {
+      type: String,
+      default: "select",
     },
     detail: {
       type: String,
@@ -44,10 +48,6 @@ const vehicleSchema = mongoose.Schema(
       default: "not-done",
     },
     gas: {
-      type: String,
-      default: "not-done",
-    },
-    safetyCheck: {
       type: String,
       default: "not-done",
     },

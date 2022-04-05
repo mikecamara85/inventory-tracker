@@ -14,14 +14,14 @@ function Main() {
   const isSoldInput = useRef();
   const mainGridParent = useRef();
   const makeInput = useRef();
-  const majorServiceInput = useRef();
+  const serviceInput = useRef();
   const modelInput = useRef();
   const photosInput = useRef();
   const priceTagInput = useRef();
-  const safetyCheckInput = useRef();
   const selectedModule = useRef();
   const stickersInput = useRef();
   const stockInput = useRef();
+  const techInput = useRef();
   const yearInput = useRef();
   //
   const [authenticated, setAuthenticated] = useState(false);
@@ -30,12 +30,12 @@ function Main() {
   const [enteredDetail, setEnteredDetail] = useState("not-done");
   const [enteredGas, setEnteredGas] = useState("not-done");
   const [enteredIsSold, setEnteredIsSold] = useState(false);
-  const [enteredMajorService, setEnteredMajorService] = useState("not-needed");
+  const [enteredService, setEnteredService] = useState("not-done");
+  const [enteredTech, setEnteredTech] = useState("select");
   const [enteredMake, setEnteredMake] = useState("");
   const [enteredModel, setEnteredModel] = useState("");
   const [enteredPhotos, setEnteredPhotos] = useState("not-done");
   const [enteredPriceTag, setEnteredPriceTag] = useState("not-done");
-  const [enteredSafetyCheck, setEnteredSafetyCheck] = useState("not-done");
   const [enteredStickers, setEnteredStickers] = useState("not-done");
   const [enteredStock, setEnteredStock] = useState("");
   const [currentVehicle, setCurrentVehicle] = useState(null);
@@ -87,14 +87,13 @@ function Main() {
       // console.log(localVehicleData);
 
       localVehicleData.forEach((v, index) => {
-        if (v.bodyShop === "not-done" || v.majorService === "not-done") {
+        if (v.bodyShop === "not-done" || v.service === "not-done") {
           v["severity"] = "danger";
         } else if (
           v.detail === "not-done" ||
           v.photos === "not-done" ||
           v.description === "not-done" ||
           v.gas === "not-done" ||
-          v.safetyCheck === "not-done" ||
           v.stickers === "not-done" ||
           v.priceTag === "not-done"
         ) {
@@ -106,10 +105,9 @@ function Main() {
         if (v.severity !== "ready" && v.isSold) {
           if (
             v.bodyShop === "not-done" ||
-            v.majorService === "not-done" ||
+            v.service === "not-done" ||
             v.detail === "not-done" ||
-            v.gas === "not-done" ||
-            v.safetyCheck === "not-done"
+            v.gas === "not-done"
           ) {
             v["severity"] = "defcon";
           }
@@ -178,8 +176,12 @@ function Main() {
         setEnteredBodyShop(e.currentTarget.value);
         break;
       //
-      case "entered-major-service":
-        setEnteredMajorService(e.currentTarget.value);
+      case "entered-service":
+        setEnteredService(e.currentTarget.value);
+        break;
+      //
+      case "entered-tech":
+        setEnteredTech(e.currentTarget.value);
         break;
       //
       case "entered-detail":
@@ -196,10 +198,6 @@ function Main() {
       //
       case "entered-gas":
         setEnteredGas(e.currentTarget.value);
-        break;
-      //
-      case "entered-safety-check":
-        setEnteredSafetyCheck(e.currentTarget.value);
         break;
       //
       case "entered-stickers":
@@ -226,6 +224,16 @@ function Main() {
           Inventory Tracker
         </div>
         <div className="d-flex justify-content-center">
+          <button
+            className="medium-text m-3"
+            onClick={() => {
+              const popup = document.querySelector(".popup");
+              popup.classList.remove("hidden");
+              mainGridParent.current.classList.add("disabled");
+            }}
+          >
+            Add Vehicle
+          </button>
           <button
             className="medium-text m-3"
             onClick={() => {
@@ -259,16 +267,6 @@ function Main() {
             }}
           >
             Delete Vehicle
-          </button>
-          <button
-            className="medium-text m-3"
-            onClick={() => {
-              const popup = document.querySelector(".popup");
-              popup.classList.remove("hidden");
-              mainGridParent.current.classList.add("disabled");
-            }}
-          >
-            Add Vehicle
           </button>
         </div>
         <div
@@ -324,19 +322,19 @@ function Main() {
             </div>
             <div className="row d-flex justify-content-center full-width  selected-row">
               <p className="small-text mr-5 half-width d-flex align-items-center justify-content-center">
-                Major Service
+                Service
               </p>
               <select
                 className="small-text half-width center-text "
-                value={currentVehicle ? currentVehicle.majorService : ""}
+                value={currentVehicle ? currentVehicle.service : ""}
                 onChange={(e) => {
-                  const majorService = e.currentTarget.value;
+                  const service = e.currentTarget.value;
                   (async function () {
                     const res = await axios.post(
                       "/api/v1/vehicle/update-vehicle",
                       {
                         currentVehicle: currentVehicle ? currentVehicle : null,
-                        majorService,
+                        service,
                       },
                       axiosConfig
                     );
@@ -344,7 +342,7 @@ function Main() {
                     if (res.data.success) {
                       setCurrentVehicle({
                         ...currentVehicle,
-                        majorService,
+                        service,
                       });
                       setInventoryLoaded(false);
                     } else {
@@ -358,6 +356,55 @@ function Main() {
                 <option value="not-done">Not Done</option>
                 <option value="done">Done!</option>
               </select>
+              {currentVehicle &&
+                currentVehicle.service &&
+                currentVehicle.service === "not-done" && (
+                  <div className="row d-flex justify-content-center full-width  selected-row">
+                    <p className="small-text mr-5 half-width d-flex align-items-center justify-content-center">
+                      Tech
+                    </p>
+                    <select
+                      className="small-text half-width center-text"
+                      onChange={(e) => {
+                        const tech = e.currentTarget.value;
+                        (async function () {
+                          const res = await axios.post(
+                            "/api/v1/vehicle/update-vehicle",
+                            {
+                              currentVehicle: currentVehicle
+                                ? currentVehicle
+                                : null,
+                              tech,
+                            },
+                            axiosConfig
+                          );
+
+                          if (res.data.success) {
+                            setCurrentVehicle({
+                              ...currentVehicle,
+                              tech,
+                            });
+                            setInventoryLoaded(false);
+                          } else {
+                            alert("could not update database...");
+                            window.location.reload();
+                          }
+                        })();
+                      }}
+                      value={
+                        currentVehicle && currentVehicle.tech
+                          ? currentVehicle.tech
+                          : "select"
+                      }
+                    >
+                      <option value="select">select...</option>
+                      <option value="manny">Manny</option>
+                      <option value="art">Art</option>
+                      <option value="tommy">Tommy</option>
+                      <option value="other">Other</option>
+                    </select>
+                  </div>
+                )}
             </div>
             <div className="row d-flex justify-content-center full-width  selected-row">
               <p className="small-text mr-5 half-width d-flex align-items-center justify-content-center">
@@ -507,43 +554,7 @@ function Main() {
                 <option value="done">Done!</option>
               </select>
             </div>
-            <div className="row d-flex justify-content-center full-width  selected-row">
-              <p className="small-text mr-5 half-width d-flex align-items-center justify-content-center">
-                Safety Check
-              </p>
-              <select
-                className="small-text half-width center-text "
-                value={currentVehicle ? currentVehicle.safetyCheck : ""}
-                onChange={(e) => {
-                  const safetyCheck = e.currentTarget.value;
-                  (async function () {
-                    const res = await axios.post(
-                      "/api/v1/vehicle/update-vehicle",
-                      {
-                        currentVehicle: currentVehicle ? currentVehicle : null,
-                        safetyCheck,
-                      },
-                      axiosConfig
-                    );
 
-                    if (res.data.success) {
-                      setCurrentVehicle({
-                        ...currentVehicle,
-                        safetyCheck,
-                      });
-                      setInventoryLoaded(false);
-                    } else {
-                      alert("could not update database...");
-                      window.location.reload();
-                    }
-                  })();
-                }}
-              >
-                <option value="not-needed">Not Needed</option>
-                <option value="not-done">Not Done</option>
-                <option value="done">Done!</option>
-              </select>
-            </div>
             <div className="row d-flex justify-content-center full-width  selected-row">
               <p className="small-text mr-5 half-width d-flex align-items-center justify-content-center">
                 Stickers
@@ -654,11 +665,52 @@ function Main() {
                 <option value={false}>false</option>
               </select>
             </div>
-            <div className="d-flex flex-column justify-content-center align-items-center full-width  selected-row">
+            <div className="d-flex flex-column justify-content-center align-items-center full-width selected-row">
               <p className="small-text m-3 d-flex align-items-center justify-content-center">
                 Note Viewer
               </p>
-              <div className="small-text ninety-width  note-viewer"></div>
+              <div className="small-text ninety-width  note-viewer">
+                <div className="note d-flex m-3 justify-content-between">
+                  <div className="note-info">
+                    <p>Mike</p>
+                    <p>04/05/2022</p>
+                    <p>2:00pm</p>
+                  </div>
+                  <p className="note-body p-3 ml-3">Note Body</p>
+                </div>
+                <div className="note d-flex m-3 justify-content-between">
+                  <div className="note-info">
+                    <p>Mike</p>
+                    <p>04/05/2022</p>
+                    <p>2:30pm</p>
+                  </div>
+                  <p className="note-body p-3 ml-3">Another Note Body</p>
+                </div>
+                <div className="note d-flex m-3 justify-content-between">
+                  <div className="note-info">
+                    <p>Mike</p>
+                    <p>04/05/2022</p>
+                    <p>2:30pm</p>
+                  </div>
+                  <p className="note-body p-3 ml-3">Another Note Body</p>
+                </div>
+                <div className="note d-flex m-3 justify-content-between">
+                  <div className="note-info">
+                    <p>Mike</p>
+                    <p>04/05/2022</p>
+                    <p>2:30pm</p>
+                  </div>
+                  <p className="note-body p-3 ml-3">Another Note Body</p>
+                </div>
+                <div className="note d-flex m-3 justify-content-between">
+                  <div className="note-info">
+                    <p>Mike</p>
+                    <p>04/05/2022</p>
+                    <p>2:30pm</p>
+                  </div>
+                  <p className="note-body p-3 ml-3">Another Note Body</p>
+                </div>
+              </div>
             </div>
             <div className="d-flex flex-column justify-content-center align-items-center full-width  selected-row">
               <p className="small-text m-3 d-flex align-items-center justify-content-center">
@@ -666,6 +718,7 @@ function Main() {
               </p>
               <textarea className="small-text ninety-width  note-composer"></textarea>
             </div>
+            <button className="m-3 medium-text">Save</button>
           </div>
         </div>
         <div className="container main-grid d-flex flex-wrap justify-content-around p-5">
@@ -842,12 +895,12 @@ function Main() {
           </select>
         </div>
         <div className="small-text d-flex align-items-center justify-content-between mt-3 bg-light">
-          <p className="mr-5">Major Service:</p>
+          <p className="mr-5">Service:</p>
           <select
             className="field-input bg-light"
-            ref={majorServiceInput}
-            id="entered-major-service"
-            value={enteredMajorService}
+            ref={serviceInput}
+            id="entered-service"
+            value={enteredService}
             onChange={updateEntered}
           >
             <option value="not-needed">Not Needed</option>
@@ -855,6 +908,26 @@ function Main() {
             <option value="done">Done!</option>
           </select>
         </div>
+
+        {enteredService === "not-done" && (
+          <div className="small-text d-flex align-items-center justify-content-between mt-3 bg-light">
+            <p className="mr-5">Tech:</p>
+            <select
+              className="field-input bg-light"
+              ref={techInput}
+              id="entered-tech"
+              value={enteredTech}
+              onChange={updateEntered}
+            >
+              <option value="select">select...</option>
+              <option value="manny">Manny</option>
+              <option value="art">Art</option>
+              <option value="tommy">Tommy</option>
+              <option value="other">other</option>
+            </select>
+          </div>
+        )}
+
         <div className="small-text d-flex align-items-center justify-content-between mt-3">
           <p className="mr-5">Detail:</p>
           <select
@@ -911,20 +984,7 @@ function Main() {
             <option value="done">Done!</option>
           </select>
         </div>
-        <div className="small-text d-flex align-items-center justify-content-between mt-3">
-          <p className="mr-5">Safety Check:</p>
-          <select
-            className="field-input"
-            ref={safetyCheckInput}
-            id="entered-safety-check"
-            value={enteredSafetyCheck}
-            onChange={updateEntered}
-          >
-            <option value="not-needed">Not Needed</option>
-            <option value="not-done">Not Done</option>
-            <option value="done">Done!</option>
-          </select>
-        </div>
+
         <div className="small-text d-flex align-items-center justify-content-between mt-3 bg-light">
           <p className="mr-5">Stickers:</p>
           <select
@@ -984,12 +1044,12 @@ function Main() {
                   enteredModel,
                   enteredStock,
                   enteredBodyShop,
-                  enteredMajorService,
+                  enteredService,
+                  enteredTech,
                   enteredDetail,
                   enteredPhotos,
                   enteredDescription,
                   enteredGas,
-                  enteredSafetyCheck,
                   enteredStickers,
                   enteredPriceTag,
                   enteredIsSold,

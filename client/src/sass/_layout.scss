@@ -73,11 +73,16 @@ select {
 
 .note-viewer {
   min-height: 200px;
+  max-height: 300px;
+  overflow-y: scroll;
   border: 2px solid black;
 }
 
 .note-composer {
   min-height: 150px;
+  max-height: 200px;
+  overflow-y: scroll;
+  padding: 1rem;
 }
 
 .disabled {
@@ -88,4 +93,22 @@ select {
     rgba(0, 0, 0, 0.5)
   );
   pointer-events: none;
+}
+
+.note {
+  &-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: flex-start;
+    width: 25%;
+  }
+
+  &-body {
+    display: flex;
+    justify-content: flex-start;
+    border: 2px solid blue;
+    border-radius: 10px;
+    width: 74.9%;
+  }
 }
