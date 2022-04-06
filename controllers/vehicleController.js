@@ -247,6 +247,18 @@ exports.updateVehicle = async (req, res, next) => {
           },
         ],
       });
+    } else if (req.body.noteBody) {
+      await Vehicle.findByIdAndUpdate(req.body.currentVehicle._id, {
+        notes: [
+          ...req.body.currentVehicle.notes,
+          {
+            name: user.name,
+            body: req.body.noteBody,
+            user: user._id,
+            createdAt: new Date(),
+          },
+        ],
+      });
     }
 
     const updatedVehicle = await Vehicle.findById(req.body.currentVehicle._id);
