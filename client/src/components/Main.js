@@ -14,6 +14,7 @@ function Main() {
   const gasInput = useRef();
   const isSoldInput = useRef();
   const mainGridParent = useRef();
+  const mainGridRef = useRef();
   const makeInput = useRef();
   const serviceInput = useRef();
   const modelInput = useRef();
@@ -69,6 +70,7 @@ function Main() {
   const deselector = (e) => {
     setCurrentVehicle(null);
     selectedModule.current.classList.add("hidden");
+    mainGridRef.current.classList.remove("hidden");
     window.location.reload();
   };
   //
@@ -146,7 +148,18 @@ function Main() {
         }
       });
 
+      const photosNoDescr = [];
+
       setVehicleData([...defcons, ...dangers, ...warnings, ...readys]);
+
+      [...defcons, ...dangers, ...warnings, ...readys].forEach((v) => {
+        if (v.photos === "done" && v.description === "not-done") {
+          photosNoDescr.push(v);
+        }
+      });
+
+      console.log(photosNoDescr);
+
       setInventoryLoaded(true);
     } catch (error) {
       console.log(error.message);
@@ -155,6 +168,8 @@ function Main() {
   //
   const selector = (e) => {
     selectedModule.current.classList.remove("hidden");
+    mainGridRef.current.classList.add("hidden");
+    window.location.href = "#selected-module-top";
   };
   //
   const updateEntered = (e) => {
@@ -275,6 +290,7 @@ function Main() {
         <div
           className="row d-flex justify-content-center mb-5 hidden"
           ref={selectedModule}
+          id="selected-module-top"
         >
           <div className="expanding-module expanding-module-ready expanding-module-expanded d-flex flex-column justify-content-around">
             <div className="large-text text-danger" onClick={deselector}>
@@ -737,7 +753,10 @@ function Main() {
             <button className="m-3 medium-text">Save</button>
           </div>
         </div>
-        <div className="container main-grid d-flex flex-wrap justify-content-around p-5">
+        <div
+          className="container main-grid d-flex flex-wrap justify-content-around p-5"
+          ref={mainGridRef}
+        >
           {vehicleData.map((v, idx) => {
             return (
               <div key={idx}>
