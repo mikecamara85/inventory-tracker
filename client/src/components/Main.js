@@ -16,6 +16,7 @@ function Main() {
   const mainGridParent = useRef();
   const mainGridRef = useRef();
   const makeInput = useRef();
+  const noteComposer = useRef();
   const serviceInput = useRef();
   const modelInput = useRef();
   const photosInput = useRef();
@@ -241,6 +242,10 @@ function Main() {
         <div className="row d-flex justify-content-center m-5 large-text">
           Inventory Tracker
         </div>
+        <div className="row d-flex justify-content-center mb-5 small-text">
+          v1.0.0 <span>&nbsp;by&nbsp;</span>
+          <a href="https://www.bayhawk.cc">Bayhawk Software</a>
+        </div>
         <div className="d-flex justify-content-center">
           <button
             className="medium-text m-3"
@@ -338,7 +343,7 @@ function Main() {
                 <option value="done">Done!</option>
               </select>
             </div>
-            <div className="row d-flex justify-content-center full-width  selected-row">
+            <div className="row d-flex justify-content-center full-width  selected-row service-special">
               <p className="small-text mr-5 half-width d-flex align-items-center justify-content-center">
                 Service
               </p>
@@ -358,10 +363,7 @@ function Main() {
                     );
 
                     if (res.data.success) {
-                      setCurrentVehicle({
-                        ...currentVehicle,
-                        service,
-                      });
+                      setCurrentVehicle(res.data.vehicle);
                       setInventoryLoaded(false);
                     } else {
                       alert("could not update database...");
@@ -401,10 +403,7 @@ function Main() {
                             console.log(
                               "about to set current vehicle to one with updated tech"
                             );
-                            setCurrentVehicle({
-                              ...currentVehicle,
-                              tech,
-                            });
+                            setCurrentVehicle(res.data.vehicle);
 
                             setInventoryLoaded(false);
                           } else {
@@ -448,10 +447,7 @@ function Main() {
                     );
 
                     if (res.data.success) {
-                      setCurrentVehicle({
-                        ...currentVehicle,
-                        detail,
-                      });
+                      setCurrentVehicle(res.data.vehicle);
                       setInventoryLoaded(false);
                     } else {
                       alert("could not update database...");
@@ -485,10 +481,7 @@ function Main() {
                     );
 
                     if (res.data.success) {
-                      setCurrentVehicle({
-                        ...currentVehicle,
-                        photos,
-                      });
+                      setCurrentVehicle(res.data.vehicle);
                       setInventoryLoaded(false);
                     } else {
                       alert("could not update database...");
@@ -522,10 +515,7 @@ function Main() {
                     );
 
                     if (res.data.success) {
-                      setCurrentVehicle({
-                        ...currentVehicle,
-                        description,
-                      });
+                      setCurrentVehicle(res.data.vehicle);
                       setInventoryLoaded(false);
                     } else {
                       alert("could not update database...");
@@ -559,10 +549,7 @@ function Main() {
                     );
 
                     if (res.data.success) {
-                      setCurrentVehicle({
-                        ...currentVehicle,
-                        gas,
-                      });
+                      setCurrentVehicle(res.data.vehicle);
                       setInventoryLoaded(false);
                     } else {
                       alert("could not update database...");
@@ -596,10 +583,7 @@ function Main() {
                     );
 
                     if (res.data.success) {
-                      setCurrentVehicle({
-                        ...currentVehicle,
-                        stickers,
-                      });
+                      setCurrentVehicle(res.data.vehicle);
                       setInventoryLoaded(false);
                     } else {
                       alert("could not update database...");
@@ -633,10 +617,7 @@ function Main() {
                     );
 
                     if (res.data.success) {
-                      setCurrentVehicle({
-                        ...currentVehicle,
-                        priceTag,
-                      });
+                      setCurrentVehicle(res.data.vehicle);
                       setInventoryLoaded(false);
                     } else {
                       alert("could not update database...");
@@ -670,10 +651,7 @@ function Main() {
                     );
 
                     if (res.data.success) {
-                      setCurrentVehicle({
-                        ...currentVehicle,
-                        isSold,
-                      });
+                      setCurrentVehicle(res.data.vehicle);
                       setInventoryLoaded(false);
                     } else {
                       alert("could not update database...");
@@ -729,28 +707,68 @@ function Main() {
                 {currentVehicle &&
                   currentVehicle.notes &&
                   currentVehicle.notes.length &&
-                  currentVehicle.notes.map((n, idx) => (
-                    <div
-                      className="note d-flex m-3 justify-content-between"
-                      key={idx}
-                    >
-                      <div className="note-info">
-                        <p>{n.name && n.name.split(" ")[0]}</p>
-                        <p>{format(new Date(n.createdAt), "P")}</p>
-                        <p>{format(new Date(n.createdAt), "p")}</p>
+                  currentVehicle.notes
+                    .slice(0)
+                    .reverse()
+                    .map((n, idx) => (
+                      <div
+                        className="note d-flex m-3 justify-content-between"
+                        key={idx}
+                      >
+                        <div className="note-info">
+                          <p>{n.name && n.name.split(" ")[0]}</p>
+                          <p className="tiny-text">
+                            {format(new Date(n.createdAt), "P")}
+                          </p>
+                          <p className="tiny-text">
+                            {format(new Date(n.createdAt), "p")}
+                          </p>
+                        </div>
+                        <p className="note-body p-3 ml-3">{n.body}</p>
                       </div>
-                      <p className="note-body p-3 ml-3">{n.body}</p>
-                    </div>
-                  ))}
+                    ))}
               </div>
             </div>
             <div className="d-flex flex-column justify-content-center align-items-center full-width  selected-row">
               <p className="small-text m-3 d-flex align-items-center justify-content-center">
                 Note Composer
               </p>
-              <textarea className="small-text ninety-width  note-composer"></textarea>
+              <textarea
+                className="small-text ninety-width  note-composer"
+                ref={noteComposer}
+              ></textarea>
             </div>
-            <button className="m-3 medium-text">Save</button>
+            <button
+              className="m-3 medium-text"
+              onClick={(e) => {
+                if (
+                  noteComposer.current.value &&
+                  noteComposer.current.value !== "" &&
+                  noteComposer.current.value !== " "
+                ) {
+                  (async function () {
+                    const res = await axios.post(
+                      "/api/v1/vehicle/update-vehicle",
+                      {
+                        currentVehicle: currentVehicle ? currentVehicle : null,
+                        noteBody: noteComposer.current.value,
+                      },
+                      axiosConfig
+                    );
+
+                    if (res.data.success) {
+                      setCurrentVehicle(res.data.vehicle);
+                      setInventoryLoaded(false);
+                    } else {
+                      alert("could not update database...");
+                      window.location.reload();
+                    }
+                  })();
+                }
+              }}
+            >
+              Save
+            </button>
           </div>
         </div>
         <div
