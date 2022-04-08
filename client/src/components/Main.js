@@ -16,6 +16,9 @@ function Main() {
   const mainGridParent = useRef();
   const mainGridRef = useRef();
   const makeInput = useRef();
+  const needsDescriptionFilter = useRef();
+  const needsPhotosFilter = useRef();
+  const needsServiceFilter = useRef();
   const noteComposer = useRef();
   const serviceInput = useRef();
   const modelInput = useRef();
@@ -25,6 +28,7 @@ function Main() {
   const stickersInput = useRef();
   const stockInput = useRef();
   const techInput = useRef();
+  const viewAllFilter = useRef();
   const yearInput = useRef();
   //
   const [authenticated, setAuthenticated] = useState(false);
@@ -768,6 +772,56 @@ function Main() {
               }}
             >
               Save
+            </button>
+          </div>
+        </div>
+
+        <div className="row d-flex flex-column bg-light justify-content-center align-items-center medium-text pb-3">
+          <p className="m-3">Filters:</p>
+          <div className=" d-flex flex-row justify-content-center align-items-center flex-wrap">
+            <button
+              className="m-3 current-filter"
+              ref={viewAllFilter}
+              onClick={() => {
+                const cur = document.querySelector(".current-filter");
+                cur.classList.remove("current-filter");
+                viewAllFilter.current.classList.add("current-filter");
+              }}
+            >
+              View All
+            </button>
+            <button
+              className="m-3"
+              ref={needsServiceFilter}
+              onClick={() => {
+                const cur = document.querySelector(".current-filter");
+                cur.classList.remove("current-filter");
+                needsServiceFilter.current.classList.add("current-filter");
+              }}
+            >
+              Needs Service
+            </button>
+            <button
+              className="m-3"
+              ref={needsPhotosFilter}
+              onClick={() => {
+                const cur = document.querySelector(".current-filter");
+                cur.classList.remove("current-filter");
+                needsPhotosFilter.current.classList.add("current-filter");
+              }}
+            >
+              Needs Photos
+            </button>
+            <button
+              className="m-3"
+              ref={needsDescriptionFilter}
+              onClick={() => {
+                const cur = document.querySelector(".current-filter");
+                cur.classList.remove("current-filter");
+                needsDescriptionFilter.current.classList.add("current-filter");
+              }}
+            >
+              Needs Description
             </button>
           </div>
         </div>

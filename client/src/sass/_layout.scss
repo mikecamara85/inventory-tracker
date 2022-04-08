@@ -24,9 +24,9 @@
   }
 
   &-danger {
-    background-color: orangered;
+    background-color: orange;
 
-    color: white;
+    color: black;
   }
 
   &-defcon {
@@ -111,4 +111,9 @@ select {
     border-radius: 10px;
     width: 74.9%;
   }
+}
+
+.current-filter {
+  background-color: black;
+  color: white;
 }
