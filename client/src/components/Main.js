@@ -32,6 +32,7 @@ function Main() {
   const yearInput = useRef();
   //
   const [authenticated, setAuthenticated] = useState(false);
+  const [currentVehicleData, setCurrentVehicleData] = useState([]);
   const [enteredBodyShop, setEnteredBodyShop] = useState("not-needed");
   const [enteredDescription, setEnteredDescription] = useState("not-done");
   const [enteredDetail, setEnteredDetail] = useState("not-done");
@@ -76,7 +77,96 @@ function Main() {
     setCurrentVehicle(null);
     selectedModule.current.classList.add("hidden");
     mainGridRef.current.classList.remove("hidden");
-    window.location.reload();
+    (async function () {
+      console.log("loading inventory");
+      const res = await axios.post(
+        "/api/v1/vehicle/get-vehicle-data",
+        {},
+        axiosConfig
+      );
+
+      if (!res || !res.data || !res.data.success) {
+        throw new Error("could not get vehicle data from database");
+      }
+
+      const localVehicleData = res.data.vehicleData;
+
+      localVehicleData.forEach((v, index) => {
+        if (v.bodyShop === "not-done" || v.service === "not-done") {
+          v["severity"] = "danger";
+        } else if (
+          v.detail === "not-done" ||
+          v.photos === "not-done" ||
+          v.description === "not-done" ||
+          v.gas === "not-done" ||
+          v.stickers === "not-done" ||
+          v.priceTag === "not-done"
+        ) {
+          v["severity"] = "warning";
+        } else {
+          v["severity"] = "ready";
+        }
+
+        if (v.severity !== "ready" && v.isSold) {
+          if (
+            v.bodyShop === "not-done" ||
+            v.service === "not-done" ||
+            v.detail === "not-done" ||
+            v.gas === "not-done"
+          ) {
+            v["severity"] = "defcon";
+          }
+        }
+      });
+
+      const defcons = [];
+      const dangers = [];
+      const warnings = [];
+      const readys = [];
+
+      localVehicleData.forEach((v) => {
+        if (v.severity === "defcon") {
+          defcons.push(v);
+        }
+      });
+
+      localVehicleData.forEach((v) => {
+        if (v.severity === "danger") {
+          dangers.push(v);
+        }
+      });
+
+      localVehicleData.forEach((v) => {
+        if (v.severity === "warning") {
+          warnings.push(v);
+        }
+      });
+
+      localVehicleData.forEach((v) => {
+        if (v.severity === "ready") {
+          readys.push(v);
+        }
+      });
+
+      const sortedVehicleData = [
+        ...defcons,
+        ...dangers,
+        ...warnings,
+        ...readys,
+      ];
+
+      const updatedVehicles = [];
+
+      sortedVehicleData.forEach((sV) => {
+        currentVehicleData.forEach((cV) => {
+          if (sV._id === cV._id) {
+            updatedVehicles.push(sV);
+          }
+        });
+      });
+
+      setCurrentVehicleData([...updatedVehicles]);
+    })();
   };
   //
   const loadInventory = async () => {
@@ -156,6 +246,9 @@ function Main() {
       const photosNoDescr = [];
 
       setVehicleData([...defcons, ...dangers, ...warnings, ...readys]);
+      if (!currentVehicleData[0]) {
+        setCurrentVehicleData([...defcons, ...dangers, ...warnings, ...readys]);
+      }
 
       [...defcons, ...dangers, ...warnings, ...readys].forEach((v) => {
         if (v.photos === "done" && v.description === "not-done") {
@@ -380,56 +473,50 @@ function Main() {
                 <option value="not-done">Not Done</option>
                 <option value="done">Done!</option>
               </select>
-              {currentVehicle &&
-                currentVehicle.service &&
-                currentVehicle.service === "not-done" && (
-                  <div className="row d-flex justify-content-center full-width  selected-row">
-                    <p className="small-text mr-5 half-width d-flex align-items-center justify-content-center">
-                      Tech
-                    </p>
-                    <select
-                      className="small-text half-width center-text"
-                      onChange={(e) => {
-                        const tech = e.currentTarget.value;
-                        (async function () {
-                          const res = await axios.post(
-                            "/api/v1/vehicle/update-vehicle",
-                            {
-                              currentVehicle: currentVehicle
-                                ? currentVehicle
-                                : null,
-                              tech,
-                            },
-                            axiosConfig
-                          );
+            </div>
+            <div className="row d-flex justify-content-center full-width  selected-row">
+              <p className="small-text mr-5 half-width d-flex align-items-center justify-content-center">
+                Tech
+              </p>
+              <select
+                className="small-text half-width center-text"
+                onChange={(e) => {
+                  const tech = e.currentTarget.value;
+                  (async function () {
+                    const res = await axios.post(
+                      "/api/v1/vehicle/update-vehicle",
+                      {
+                        currentVehicle: currentVehicle ? currentVehicle : null,
+                        tech,
+                      },
+                      axiosConfig
+                    );
 
-                          if (res.data.success) {
-                            console.log(
-                              "about to set current vehicle to one with updated tech"
-                            );
-                            setCurrentVehicle(res.data.vehicle);
+                    if (res.data.success) {
+                      console.log(
+                        "about to set current vehicle to one with updated tech"
+                      );
+                      setCurrentVehicle(res.data.vehicle);
 
-                            setInventoryLoaded(false);
-                          } else {
-                            alert("could not update database...");
-                            window.location.reload();
-                          }
-                        })();
-                      }}
-                      value={
-                        currentVehicle && currentVehicle.tech
-                          ? currentVehicle.tech
-                          : "select"
-                      }
-                    >
-                      <option value="select">select...</option>
-                      <option value="manny">Manny</option>
-                      <option value="art">Art</option>
-                      <option value="tommy">Tommy</option>
-                      <option value="other">Other</option>
-                    </select>
-                  </div>
-                )}
+                      setInventoryLoaded(false);
+                    } else {
+                      alert("could not update database...");
+                      window.location.reload();
+                    }
+                  })();
+                }}
+                value={
+                  currentVehicle && currentVehicle.tech
+                    ? currentVehicle.tech
+                    : "select"
+                }
+              >
+                <option value="select">select...</option>
+                <option value="manny">Manny</option>
+                <option value="art">Art</option>
+                <option value="tommy">Tommy</option>
+                <option value="other">Other</option>
+              </select>
             </div>
             <div className="row d-flex justify-content-center full-width  selected-row">
               <p className="small-text mr-5 half-width d-flex align-items-center justify-content-center">
@@ -786,6 +873,8 @@ function Main() {
                 const cur = document.querySelector(".current-filter");
                 cur.classList.remove("current-filter");
                 viewAllFilter.current.classList.add("current-filter");
+
+                setCurrentVehicleData([...vehicleData]);
               }}
             >
               View All
@@ -797,6 +886,17 @@ function Main() {
                 const cur = document.querySelector(".current-filter");
                 cur.classList.remove("current-filter");
                 needsServiceFilter.current.classList.add("current-filter");
+
+                // vehicleData
+                const needsServiceVehicles = [];
+
+                vehicleData.forEach((v) => {
+                  if (v.service === "not-done") {
+                    needsServiceVehicles.push(v);
+                  }
+                });
+
+                setCurrentVehicleData([...needsServiceVehicles]);
               }}
             >
               Needs Service
@@ -808,6 +908,17 @@ function Main() {
                 const cur = document.querySelector(".current-filter");
                 cur.classList.remove("current-filter");
                 needsPhotosFilter.current.classList.add("current-filter");
+
+                // vehicleData
+                const needsPhotosVehicles = [];
+
+                vehicleData.forEach((v) => {
+                  if (v.photos === "not-done") {
+                    needsPhotosVehicles.push(v);
+                  }
+                });
+
+                setCurrentVehicleData([...needsPhotosVehicles]);
               }}
             >
               Needs Photos
@@ -819,6 +930,17 @@ function Main() {
                 const cur = document.querySelector(".current-filter");
                 cur.classList.remove("current-filter");
                 needsDescriptionFilter.current.classList.add("current-filter");
+
+                // vehicleData
+                const needsDescriptionVehicles = [];
+
+                vehicleData.forEach((v) => {
+                  if (v.description === "not-done") {
+                    needsDescriptionVehicles.push(v);
+                  }
+                });
+
+                setCurrentVehicleData([...needsDescriptionVehicles]);
               }}
             >
               Needs Description
@@ -829,7 +951,11 @@ function Main() {
           className="container main-grid d-flex flex-wrap justify-content-around p-5"
           ref={mainGridRef}
         >
-          {vehicleData.map((v, idx) => {
+          <div className="full-width d-flex justify-content-center align-items-center medium-text">
+            <p>Count:&nbsp;</p>
+            <p>{currentVehicleData && currentVehicleData.length}</p>
+          </div>
+          {currentVehicleData.map((v, idx) => {
             return (
               <div key={idx}>
                 {v.severity === "defcon" && (
@@ -1016,24 +1142,22 @@ function Main() {
           </select>
         </div>
 
-        {enteredService === "not-done" && (
-          <div className="small-text d-flex align-items-center justify-content-between mt-3 bg-light">
-            <p className="mr-5">Tech:</p>
-            <select
-              className="field-input bg-light"
-              ref={techInput}
-              id="entered-tech"
-              value={enteredTech}
-              onChange={updateEntered}
-            >
-              <option value="select">select...</option>
-              <option value="manny">Manny</option>
-              <option value="art">Art</option>
-              <option value="tommy">Tommy</option>
-              <option value="other">other</option>
-            </select>
-          </div>
-        )}
+        <div className="small-text d-flex align-items-center justify-content-between mt-3 bg-light">
+          <p className="mr-5">Tech:</p>
+          <select
+            className="field-input bg-light"
+            ref={techInput}
+            id="entered-tech"
+            value={enteredTech}
+            onChange={updateEntered}
+          >
+            <option value="select">select...</option>
+            <option value="manny">Manny</option>
+            <option value="art">Art</option>
+            <option value="tommy">Tommy</option>
+            <option value="other">other</option>
+          </select>
+        </div>
 
         <div className="small-text d-flex align-items-center justify-content-between mt-3">
           <p className="mr-5">Detail:</p>
