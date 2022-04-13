@@ -157,6 +157,7 @@ function Main() {
 
       const updatedVehicles = [];
 
+      // nested loop 👎
       sortedVehicleData.forEach((sV) => {
         currentVehicleData.forEach((cV) => {
           if (sV._id === cV._id) {
