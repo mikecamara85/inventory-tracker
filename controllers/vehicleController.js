@@ -261,6 +261,20 @@ exports.updateVehicle = async (req, res, next) => {
       });
     }
 
+    await Vehicle.findByIdAndUpdate(req.body.currentVehicle._id, {
+      lastAccessed: new Date(),
+      notes: [
+        ...req.body.currentVehicle.notes,
+        {
+          name: user.name,
+          body: `Vehicle Data Accessed!`,
+          user: user._id,
+          createdAt: new Date(),
+        },
+      ],
+    });
+
+
     const updatedVehicle = await Vehicle.findById(req.body.currentVehicle._id);
 
     res.status(200).send({

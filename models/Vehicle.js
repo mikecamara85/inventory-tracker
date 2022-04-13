@@ -78,6 +78,10 @@ const vehicleSchema = mongoose.Schema(
         },
       ],
     },
+    lastAccessed: {
+      type: Date,
+      default: new Date()
+    }
   },
   { timestamps: true }
 );

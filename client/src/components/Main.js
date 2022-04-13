@@ -9,6 +9,7 @@ function Main() {
   const navigate = useNavigate();
 
   const bodyShopInput = useRef();
+  const checkTodayFilter = useRef();
   const descriptionInput = useRef();
   const detailInput = useRef();
   const gasInput = useRef();
@@ -49,6 +50,7 @@ function Main() {
   const [currentVehicle, setCurrentVehicle] = useState(null);
   const [enteredYear, setEnteredYear] = useState("");
   const [inventoryLoaded, setInventoryLoaded] = useState(false);
+  const [todayInventory, setTodayInventory] = useState([]);
   const [vehicleData, setVehicleData] = useState([]);
   //
 
@@ -162,6 +164,10 @@ function Main() {
         currentVehicleData.forEach((cV) => {
           if (sV._id === cV._id) {
             updatedVehicles.push(sV);
+
+            if (checkTodayFilter.current.classList.includes('')) {
+// left off here
+            }
           }
         });
       });
@@ -247,9 +253,7 @@ function Main() {
       const photosNoDescr = [];
 
       setVehicleData([...defcons, ...dangers, ...warnings, ...readys]);
-      if (!currentVehicleData[0]) {
-        setCurrentVehicleData([...defcons, ...dangers, ...warnings, ...readys]);
-      }
+      
 
       [...defcons, ...dangers, ...warnings, ...readys].forEach((v) => {
         if (v.photos === "done" && v.description === "not-done") {
@@ -328,7 +332,7 @@ function Main() {
         }
       });
 
-      console.log("to delete from inventory:", notFounds);
+      // console.log("to delete from inventory:", notFounds);
 
       const currentStocksNoVehicle = [];
 
@@ -344,9 +348,70 @@ function Main() {
         }
       });
 
-      console.log("must add to inventory: ", currentStocksNoVehicle);
+      // console.log("must add to inventory: ", currentStocksNoVehicle);
 
-      // console.log(photosNoDescr);
+      // GENERATE LIST OF CARS TO UPDATE
+      // this list should contain 1/6 of the inventory
+      // it should be the 1/6th with the longest period of time since last accessed
+      // this means that every time an inventory unit is accessed, a note is made and a time is recorded
+      // this list also needs to contain anything with high severity (defcon)
+
+      const myArray = [...dangers, ...warnings, ...readys];
+
+      // console.log('before',  myArray);
+
+      myArray.sort((a, b)=>{
+        // console.log(new Date(a.lastAccessed).getTime(),new Date(b.lastAccessed).getTime(),new Date(a.lastAccessed).getTime() >= new Date(b.lastAccessed).getTime())
+        //
+        if (new Date(a.lastAccessed).getTime() >= new Date(b.lastAccessed).getTime()) {
+          return 1;
+        } else {
+          return -1;
+        }
+      })
+
+      // console.log('after',  myArray);
+
+      const sixth = Math.round(myArray.length / 6);
+
+      const partial = [];
+
+
+
+      myArray.forEach((v, idx) => {
+        if (idx <= sixth) {
+          partial.push(v);
+        }
+      });
+
+
+
+      const updatedInLastDay = [];
+
+      [...defcons, ...dangers, ...warnings, ...readys].forEach(v => {
+        // if (new Date(v.updatedAt).getTime() > new Date().getTime() - 86400000) {
+          if (new Date(v.updatedAt).getTime() > new Date().getTime() - 60000) {
+          updatedInLastDay.push(v);
+        }
+      })
+
+      partial.reverse();
+
+      updatedInLastDay.forEach(uild => {
+        partial.splice(0, 1);
+      });
+
+      partial.reverse();
+
+
+      setTodayInventory([...defcons, ...partial]);
+     
+      if (!currentVehicleData[0]) {
+        setCurrentVehicleData([...defcons, ...partial]);
+      }
+     
+      
+
       //
       setInventoryLoaded(true);
     } catch (error) {
@@ -583,9 +648,9 @@ function Main() {
                     );
 
                     if (res.data.success) {
-                      console.log(
-                        "about to set current vehicle to one with updated tech"
-                      );
+                      // console.log(
+                      //   "about to set current vehicle to one with updated tech"
+                      // );
                       setCurrentVehicle(res.data.vehicle);
 
                       setInventoryLoaded(false);
@@ -956,8 +1021,21 @@ function Main() {
         <div className="row d-flex flex-column bg-light justify-content-center align-items-center medium-text pb-3">
           <p className="m-3">Filters:</p>
           <div className=" d-flex flex-row justify-content-center align-items-center flex-wrap">
-            <button
+          <button
               className="m-3 current-filter"
+              ref={checkTodayFilter}
+              onClick={() => {
+                const cur = document.querySelector(".current-filter");
+                cur.classList.remove("current-filter");
+                checkTodayFilter.current.classList.add("current-filter");
+
+                setCurrentVehicleData(todayInventory);
+              }}
+            >
+              Check Today
+            </button>
+            <button
+              className="m-3"
               ref={viewAllFilter}
               onClick={() => {
                 const cur = document.querySelector(".current-filter");
