@@ -256,8 +256,97 @@ function Main() {
         }
       });
 
-      console.log(photosNoDescr);
+      const currentStocks = [
+        "1554",
+        "2037",
+        "2093",
+        "2100",
+        "2105",
+        "2106",
+        "2109",
+        "2110",
+        "2111",
+        "2112",
+        "2113",
+        "2114",
+        "2116",
+        "f1159",
+        "f1261",
+        "f1274",
+        "f1286",
+        "f1292",
+        "f1297",
+        "f1299",
+        "f1304",
+        "f1307",
+        "f1308",
+        "f1312m",
+        "f1313",
+        "f1314",
+        "f1320",
+        "f1323",
+        "f1324",
+        "f1326",
+        "f1328",
+        "f1330",
+        "f1333",
+        "f1340",
+        "f1341",
+        "f1342",
+        "f1343",
+        "f1344",
+        "f1347m",
+        "f1348j",
+        "f1349",
+        "f1353",
+        "f1354",
+        "f1355",
+        "f1356",
+        "f1357",
+        "f1358",
+        "f1360",
+        "f1361",
+        "f1362",
+        "f1363",
+        "f1364",
+        "f1366",
+        "f1367",
+        "f1368",
+        "f1370",
+        "f1371",
+        "f1372",
+        "f1373",
+        "f1374",
+      ];
 
+      const notFounds = [];
+
+      [...defcons, ...dangers, ...warnings, ...readys].forEach((v, idx) => {
+        if (!currentStocks.includes(v.stock)) {
+          notFounds.push(v);
+        }
+      });
+
+      console.log("to delete from inventory:", notFounds);
+
+      const currentStocksNoVehicle = [];
+
+      currentStocks.forEach((s, idx) => {
+        let matchFound = false;
+        [...defcons, ...dangers, ...warnings, ...readys].forEach((v) => {
+          if (!matchFound && v.stock === s) {
+            matchFound = true;
+          }
+        });
+        if (!matchFound) {
+          currentStocksNoVehicle.push(s);
+        }
+      });
+
+      console.log("must add to inventory: ", currentStocksNoVehicle);
+
+      // console.log(photosNoDescr);
+      //
       setInventoryLoaded(true);
     } catch (error) {
       console.log(error.message);
