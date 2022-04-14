@@ -444,14 +444,18 @@ function Main() {
       });
 
       const parsedPartial = [];
+      const parsedPartialIds = [];
 
       updatedInLastDay.forEach((uild) => {
         partial.forEach((p) => {
-          if (uild._id !== p._id) {
+          if (uild._id !== p._id && !parsedPartialIds.includes(p._id)) {
+            parsedPartialIds.push(p._id);
             parsedPartial.push(p);
           }
         });
       });
+
+      console.log(parsedPartial.length);
 
       setTodayInventory([...defcons, ...parsedPartial]);
 
