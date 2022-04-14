@@ -455,7 +455,7 @@ function Main() {
         });
       });
 
-      console.log(parsedPartial.length);
+      // console.log(parsedPartial.length);
 
       setTodayInventory([...defcons, ...parsedPartial]);
 
