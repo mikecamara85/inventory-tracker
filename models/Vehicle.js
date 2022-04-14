@@ -48,8 +48,8 @@ const vehicleSchema = mongoose.Schema(
       default: "not-done",
     },
     gas: {
-      type: String,
-      default: "not-done",
+      type: Date,
+      default: null,
     },
     stickers: {
       type: String,
@@ -80,8 +80,8 @@ const vehicleSchema = mongoose.Schema(
     },
     lastAccessed: {
       type: Date,
-      default: new Date()
-    }
+      default: new Date(),
+    },
   },
   { timestamps: true }
 );

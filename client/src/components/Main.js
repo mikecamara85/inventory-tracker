@@ -37,7 +37,7 @@ function Main() {
   const [enteredBodyShop, setEnteredBodyShop] = useState("not-needed");
   const [enteredDescription, setEnteredDescription] = useState("not-done");
   const [enteredDetail, setEnteredDetail] = useState("not-done");
-  const [enteredGas, setEnteredGas] = useState("not-done");
+  const [enteredGas, setEnteredGas] = useState("needs-gas");
   const [enteredIsSold, setEnteredIsSold] = useState(false);
   const [enteredService, setEnteredService] = useState("not-done");
   const [enteredTech, setEnteredTech] = useState("select");
@@ -79,6 +79,7 @@ function Main() {
     setCurrentVehicle(null);
     selectedModule.current.classList.add("hidden");
     mainGridRef.current.classList.remove("hidden");
+
     (async function () {
       console.log("loading inventory");
       const res = await axios.post(
@@ -100,7 +101,6 @@ function Main() {
           v.detail === "not-done" ||
           v.photos === "not-done" ||
           v.description === "not-done" ||
-          v.gas === "not-done" ||
           v.stickers === "not-done" ||
           v.priceTag === "not-done"
         ) {
@@ -113,8 +113,7 @@ function Main() {
           if (
             v.bodyShop === "not-done" ||
             v.service === "not-done" ||
-            v.detail === "not-done" ||
-            v.gas === "not-done"
+            v.detail === "not-done"
           ) {
             v["severity"] = "defcon";
           }
@@ -157,6 +156,64 @@ function Main() {
         ...readys,
       ];
 
+      setVehicleData([...defcons, ...dangers, ...warnings, ...readys]);
+
+      const myArray = [...dangers, ...warnings, ...readys];
+
+      // console.log('before',  myArray);
+
+      myArray.sort((a, b) => {
+        // console.log(new Date(a.lastAccessed).getTime(),new Date(b.lastAccessed).getTime(),new Date(a.lastAccessed).getTime() >= new Date(b.lastAccessed).getTime())
+        //
+        if (
+          new Date(a.lastAccessed).getTime() >=
+          new Date(b.lastAccessed).getTime()
+        ) {
+          return 1;
+        } else {
+          return -1;
+        }
+      });
+
+      // console.log('after',  myArray);
+
+      const sixth = Math.round(myArray.length / 6);
+
+      const partial = [];
+
+      myArray.forEach((v, idx) => {
+        if (idx <= sixth) {
+          partial.push(v);
+        }
+      });
+
+      const updatedInLastDay = [];
+
+      [...defcons, ...dangers, ...warnings, ...readys].forEach((v) => {
+        if (new Date(v.updatedAt).getTime() > new Date().getTime() - 43200000) {
+          todayInventory.forEach((tI) => {
+            if (tI.stock === v.stock) {
+              updatedInLastDay.push(v);
+            }
+          });
+        }
+      });
+
+      const parsedPartial = [];
+
+      updatedInLastDay.forEach((uild) => {
+        partial.forEach((p) => {
+          if (uild._id !== p._id) {
+            parsedPartial.push(p);
+          }
+        });
+      });
+
+      setTodayInventory([...defcons, ...parsedPartial]);
+
+      //
+      setInventoryLoaded(true);
+
       const updatedVehicles = [];
 
       // nested loop 👎
@@ -164,10 +221,6 @@ function Main() {
         currentVehicleData.forEach((cV) => {
           if (sV._id === cV._id) {
             updatedVehicles.push(sV);
-
-            if (checkTodayFilter.current.classList.includes('')) {
-// left off here
-            }
           }
         });
       });
@@ -200,7 +253,6 @@ function Main() {
           v.detail === "not-done" ||
           v.photos === "not-done" ||
           v.description === "not-done" ||
-          v.gas === "not-done" ||
           v.stickers === "not-done" ||
           v.priceTag === "not-done"
         ) {
@@ -213,8 +265,7 @@ function Main() {
           if (
             v.bodyShop === "not-done" ||
             v.service === "not-done" ||
-            v.detail === "not-done" ||
-            v.gas === "not-done"
+            v.detail === "not-done"
           ) {
             v["severity"] = "defcon";
           }
@@ -253,7 +304,6 @@ function Main() {
       const photosNoDescr = [];
 
       setVehicleData([...defcons, ...dangers, ...warnings, ...readys]);
-      
 
       [...defcons, ...dangers, ...warnings, ...readys].forEach((v) => {
         if (v.photos === "done" && v.description === "not-done") {
@@ -360,15 +410,18 @@ function Main() {
 
       // console.log('before',  myArray);
 
-      myArray.sort((a, b)=>{
+      myArray.sort((a, b) => {
         // console.log(new Date(a.lastAccessed).getTime(),new Date(b.lastAccessed).getTime(),new Date(a.lastAccessed).getTime() >= new Date(b.lastAccessed).getTime())
         //
-        if (new Date(a.lastAccessed).getTime() >= new Date(b.lastAccessed).getTime()) {
+        if (
+          new Date(a.lastAccessed).getTime() >=
+          new Date(b.lastAccessed).getTime()
+        ) {
           return 1;
         } else {
           return -1;
         }
-      })
+      });
 
       // console.log('after',  myArray);
 
@@ -376,41 +429,35 @@ function Main() {
 
       const partial = [];
 
-
-
       myArray.forEach((v, idx) => {
         if (idx <= sixth) {
           partial.push(v);
         }
       });
 
-
-
       const updatedInLastDay = [];
 
-      [...defcons, ...dangers, ...warnings, ...readys].forEach(v => {
-        // if (new Date(v.updatedAt).getTime() > new Date().getTime() - 86400000) {
-          if (new Date(v.updatedAt).getTime() > new Date().getTime() - 60000) {
+      [...defcons, ...dangers, ...warnings, ...readys].forEach((v) => {
+        if (new Date(v.updatedAt).getTime() > new Date().getTime() - 43200000) {
           updatedInLastDay.push(v);
         }
-      })
-
-      partial.reverse();
-
-      updatedInLastDay.forEach(uild => {
-        partial.splice(0, 1);
       });
 
-      partial.reverse();
+      const parsedPartial = [];
 
+      updatedInLastDay.forEach((uild) => {
+        partial.forEach((p) => {
+          if (uild._id !== p._id) {
+            parsedPartial.push(p);
+          }
+        });
+      });
 
-      setTodayInventory([...defcons, ...partial]);
-     
+      setTodayInventory([...defcons, ...parsedPartial]);
+
       if (!currentVehicleData[0]) {
-        setCurrentVehicleData([...defcons, ...partial]);
+        setCurrentVehicleData([...defcons, ...dangers, ...warnings, ...readys]);
       }
-     
-      
 
       //
       setInventoryLoaded(true);
@@ -775,21 +822,24 @@ function Main() {
                 <option value="done">Done!</option>
               </select>
             </div>
-            <div className="row d-flex justify-content-center full-width  selected-row">
-              <p className="small-text mr-5 half-width d-flex align-items-center justify-content-center">
-                Gas
+            <div className="row d-flex justify-content-between full-width  selected-row pl-5 pr-5">
+              <p className="small-text mr-5 center-text">Gas</p>
+              <p className="small-text">
+                {currentVehicle &&
+                  currentVehicle.gas &&
+                  new Date(currentVehicle.gas) &&
+                  format(new Date(), "P")}
               </p>
-              <select
-                className="small-text half-width center-text "
-                value={currentVehicle ? currentVehicle.gas : ""}
-                onChange={(e) => {
-                  const gas = e.currentTarget.value;
+
+              <button
+                className="small-text"
+                onClick={(e) => {
                   (async function () {
                     const res = await axios.post(
                       "/api/v1/vehicle/update-vehicle",
                       {
                         currentVehicle: currentVehicle ? currentVehicle : null,
-                        gas,
+                        gas: true,
                       },
                       axiosConfig
                     );
@@ -804,10 +854,8 @@ function Main() {
                   })();
                 }}
               >
-                <option value="not-needed">Not Needed</option>
-                <option value="not-done">Not Done</option>
-                <option value="done">Done!</option>
-              </select>
+                Refill
+              </button>
             </div>
             <div className="row d-flex justify-content-center full-width  selected-row">
               <p className="small-text mr-5 half-width d-flex align-items-center justify-content-center">
@@ -1003,6 +1051,7 @@ function Main() {
                     );
 
                     if (res.data.success) {
+                      noteComposer.current.value = "";
                       setCurrentVehicle(res.data.vehicle);
                       setInventoryLoaded(false);
                     } else {
@@ -1021,21 +1070,8 @@ function Main() {
         <div className="row d-flex flex-column bg-light justify-content-center align-items-center medium-text pb-3">
           <p className="m-3">Filters:</p>
           <div className=" d-flex flex-row justify-content-center align-items-center flex-wrap">
-          <button
-              className="m-3 current-filter"
-              ref={checkTodayFilter}
-              onClick={() => {
-                const cur = document.querySelector(".current-filter");
-                cur.classList.remove("current-filter");
-                checkTodayFilter.current.classList.add("current-filter");
-
-                setCurrentVehicleData(todayInventory);
-              }}
-            >
-              Check Today
-            </button>
             <button
-              className="m-3"
+              className="m-3 current-filter"
               ref={viewAllFilter}
               onClick={() => {
                 const cur = document.querySelector(".current-filter");
@@ -1047,6 +1083,21 @@ function Main() {
             >
               View All
             </button>
+
+            <button
+              className="m-3"
+              ref={checkTodayFilter}
+              onClick={() => {
+                const cur = document.querySelector(".current-filter");
+                cur.classList.remove("current-filter");
+                checkTodayFilter.current.classList.add("current-filter");
+
+                setCurrentVehicleData(todayInventory);
+              }}
+            >
+              Check Today
+            </button>
+
             <button
               className="m-3"
               ref={needsServiceFilter}
@@ -1378,9 +1429,8 @@ function Main() {
             value={enteredGas}
             onChange={updateEntered}
           >
-            <option value="not-needed">Not Needed</option>
-            <option value="not-done">Not Done</option>
-            <option value="done">Done!</option>
+            <option value="has-gas">Has Gas Already</option>
+            <option value="needs-gas">Needs Gas</option>
           </select>
         </div>
 

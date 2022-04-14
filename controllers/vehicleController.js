@@ -58,7 +58,7 @@ exports.enterVehicle = async (req, res, next) => {
       detail: receivedVehicle.enteredDetail,
       photos: receivedVehicle.enteredPhotos,
       description: receivedVehicle.enteredDescription,
-      gas: receivedVehicle.enteredGas,
+      gas: receivedVehicle.enteredGas === "has-gas" ? new Date() : null,
       stickers: receivedVehicle.enteredStickers,
       priceTag: receivedVehicle.enteredPriceTag,
       isSold: receivedVehicle.enteredIsSold,
@@ -119,6 +119,7 @@ exports.updateVehicle = async (req, res, next) => {
 
     if (req.body.bodyShop) {
       await Vehicle.findByIdAndUpdate(req.body.currentVehicle._id, {
+        lastAccessed: new Date(),
         bodyShop: req.body.bodyShop,
         notes: [
           ...req.body.currentVehicle.notes,
@@ -132,6 +133,7 @@ exports.updateVehicle = async (req, res, next) => {
       });
     } else if (req.body.service) {
       await Vehicle.findByIdAndUpdate(req.body.currentVehicle._id, {
+        lastAccessed: new Date(),
         service: req.body.service,
         notes: [
           ...req.body.currentVehicle.notes,
@@ -145,6 +147,7 @@ exports.updateVehicle = async (req, res, next) => {
       });
     } else if (req.body.tech) {
       await Vehicle.findByIdAndUpdate(req.body.currentVehicle._id, {
+        lastAccessed: new Date(),
         tech: req.body.tech,
         notes: [
           ...req.body.currentVehicle.notes,
@@ -158,6 +161,7 @@ exports.updateVehicle = async (req, res, next) => {
       });
     } else if (req.body.detail) {
       await Vehicle.findByIdAndUpdate(req.body.currentVehicle._id, {
+        lastAccessed: new Date(),
         detail: req.body.detail,
         notes: [
           ...req.body.currentVehicle.notes,
@@ -171,6 +175,7 @@ exports.updateVehicle = async (req, res, next) => {
       });
     } else if (req.body.photos) {
       await Vehicle.findByIdAndUpdate(req.body.currentVehicle._id, {
+        lastAccessed: new Date(),
         photos: req.body.photos,
         notes: [
           ...req.body.currentVehicle.notes,
@@ -184,6 +189,7 @@ exports.updateVehicle = async (req, res, next) => {
       });
     } else if (req.body.description) {
       await Vehicle.findByIdAndUpdate(req.body.currentVehicle._id, {
+        lastAccessed: new Date(),
         description: req.body.description,
         notes: [
           ...req.body.currentVehicle.notes,
@@ -197,12 +203,13 @@ exports.updateVehicle = async (req, res, next) => {
       });
     } else if (req.body.gas) {
       await Vehicle.findByIdAndUpdate(req.body.currentVehicle._id, {
-        gas: req.body.gas,
+        lastAccessed: new Date(),
+        gas: new Date(),
         notes: [
           ...req.body.currentVehicle.notes,
           {
             name: user.name,
-            body: `Updated gas status: ${req.body.gas}`,
+            body: `Refilled gas`,
             user: user._id,
             createdAt: new Date(),
           },
@@ -210,6 +217,7 @@ exports.updateVehicle = async (req, res, next) => {
       });
     } else if (req.body.stickers) {
       await Vehicle.findByIdAndUpdate(req.body.currentVehicle._id, {
+        lastAccessed: new Date(),
         stickers: req.body.stickers,
         notes: [
           ...req.body.currentVehicle.notes,
@@ -223,6 +231,7 @@ exports.updateVehicle = async (req, res, next) => {
       });
     } else if (req.body.priceTag) {
       await Vehicle.findByIdAndUpdate(req.body.currentVehicle._id, {
+        lastAccessed: new Date(),
         priceTag: req.body.priceTag,
         notes: [
           ...req.body.currentVehicle.notes,
@@ -236,6 +245,7 @@ exports.updateVehicle = async (req, res, next) => {
       });
     } else if (req.body.isSold) {
       await Vehicle.findByIdAndUpdate(req.body.currentVehicle._id, {
+        lastAccessed: new Date(),
         isSold: req.body.isSold,
         notes: [
           ...req.body.currentVehicle.notes,
@@ -249,6 +259,7 @@ exports.updateVehicle = async (req, res, next) => {
       });
     } else if (req.body.noteBody) {
       await Vehicle.findByIdAndUpdate(req.body.currentVehicle._id, {
+        lastAccessed: new Date(),
         notes: [
           ...req.body.currentVehicle.notes,
           {
@@ -260,20 +271,6 @@ exports.updateVehicle = async (req, res, next) => {
         ],
       });
     }
-
-    await Vehicle.findByIdAndUpdate(req.body.currentVehicle._id, {
-      lastAccessed: new Date(),
-      notes: [
-        ...req.body.currentVehicle.notes,
-        {
-          name: user.name,
-          body: `Vehicle Data Accessed!`,
-          user: user._id,
-          createdAt: new Date(),
-        },
-      ],
-    });
-
 
     const updatedVehicle = await Vehicle.findById(req.body.currentVehicle._id);
 
