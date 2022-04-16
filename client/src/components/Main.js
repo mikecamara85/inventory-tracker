@@ -149,83 +149,12 @@ function Main() {
         }
       });
 
-      const sortedVehicleData = [
-        ...defcons,
-        ...dangers,
-        ...warnings,
-        ...readys,
-      ];
+      setTodayInventory([...defcons, ...dangers, ...warnings, ...readys]);
 
-      setVehicleData([...defcons, ...dangers, ...warnings, ...readys]);
-
-      const myArray = [...dangers, ...warnings, ...readys];
-
-      // console.log('before',  myArray);
-
-      myArray.sort((a, b) => {
-        // console.log(new Date(a.lastAccessed).getTime(),new Date(b.lastAccessed).getTime(),new Date(a.lastAccessed).getTime() >= new Date(b.lastAccessed).getTime())
-        //
-        if (
-          new Date(a.lastAccessed).getTime() >=
-          new Date(b.lastAccessed).getTime()
-        ) {
-          return 1;
-        } else {
-          return -1;
-        }
-      });
-
-      // console.log('after',  myArray);
-
-      const sixth = Math.round(myArray.length / 6);
-
-      const partial = [];
-
-      myArray.forEach((v, idx) => {
-        if (idx <= sixth) {
-          partial.push(v);
-        }
-      });
-
-      const updatedInLastDay = [];
-
-      [...defcons, ...dangers, ...warnings, ...readys].forEach((v) => {
-        if (new Date(v.updatedAt).getTime() > new Date().getTime() - 43200000) {
-          todayInventory.forEach((tI) => {
-            if (tI.stock === v.stock) {
-              updatedInLastDay.push(v);
-            }
-          });
-        }
-      });
-
-      const parsedPartial = [];
-
-      updatedInLastDay.forEach((uild) => {
-        partial.forEach((p) => {
-          if (uild._id !== p._id) {
-            parsedPartial.push(p);
-          }
-        });
-      });
-
-      setTodayInventory([...defcons, ...parsedPartial]);
+      setCurrentVehicleData([...defcons, ...dangers, ...warnings, ...readys]);
 
       //
       setInventoryLoaded(true);
-
-      const updatedVehicles = [];
-
-      // nested loop 👎
-      sortedVehicleData.forEach((sV) => {
-        currentVehicleData.forEach((cV) => {
-          if (sV._id === cV._id) {
-            updatedVehicles.push(sV);
-          }
-        });
-      });
-
-      setCurrentVehicleData([...updatedVehicles]);
     })();
   };
   //
@@ -319,29 +248,23 @@ function Main() {
         "2105",
         "2106",
         "2109",
-        "2110",
         "2111",
         "2112",
         "2113",
-        "2114",
         "2116",
         "f1159",
         "f1261",
         "f1274",
         "f1286",
         "f1292",
-        "f1297",
         "f1299",
-        "f1304",
         "f1307",
         "f1308",
         "f1312m",
-        "f1313",
         "f1314",
         "f1320",
         "f1323",
         "f1324",
-        "f1326",
         "f1328",
         "f1330",
         "f1333",
@@ -358,8 +281,6 @@ function Main() {
         "f1355",
         "f1356",
         "f1357",
-        "f1358",
-        "f1360",
         "f1361",
         "f1362",
         "f1363",
@@ -372,6 +293,13 @@ function Main() {
         "f1372",
         "f1373",
         "f1374",
+        "f1375",
+        "f1376",
+        "f1377",
+        "f1378",
+        "f1379",
+        "f1380",
+        "f1381",
       ];
 
       const notFounds = [];
@@ -382,7 +310,7 @@ function Main() {
         }
       });
 
-      // console.log("to delete from inventory:", notFounds);
+      console.log("to delete from inventory:", notFounds);
 
       const currentStocksNoVehicle = [];
 
@@ -398,7 +326,7 @@ function Main() {
         }
       });
 
-      // console.log("must add to inventory: ", currentStocksNoVehicle);
+      console.log("must add to inventory: ", currentStocksNoVehicle);
 
       // GENERATE LIST OF CARS TO UPDATE
       // this list should contain 1/6 of the inventory
@@ -406,62 +334,9 @@ function Main() {
       // this means that every time an inventory unit is accessed, a note is made and a time is recorded
       // this list also needs to contain anything with high severity (defcon)
 
-      const myArray = [...dangers, ...warnings, ...readys];
+      setTodayInventory([...defcons, ...dangers, ...warnings, ...readys]);
 
-      // console.log('before',  myArray);
-
-      myArray.sort((a, b) => {
-        // console.log(new Date(a.lastAccessed).getTime(),new Date(b.lastAccessed).getTime(),new Date(a.lastAccessed).getTime() >= new Date(b.lastAccessed).getTime())
-        //
-        if (
-          new Date(a.lastAccessed).getTime() >=
-          new Date(b.lastAccessed).getTime()
-        ) {
-          return 1;
-        } else {
-          return -1;
-        }
-      });
-
-      // console.log('after',  myArray);
-
-      const sixth = Math.round(myArray.length / 6);
-
-      const partial = [];
-
-      myArray.forEach((v, idx) => {
-        if (idx <= sixth) {
-          partial.push(v);
-        }
-      });
-
-      const updatedInLastDay = [];
-
-      [...defcons, ...dangers, ...warnings, ...readys].forEach((v) => {
-        if (new Date(v.updatedAt).getTime() > new Date().getTime() - 43200000) {
-          updatedInLastDay.push(v);
-        }
-      });
-
-      const parsedPartial = [];
-      const parsedPartialIds = [];
-
-      updatedInLastDay.forEach((uild) => {
-        partial.forEach((p) => {
-          if (uild._id !== p._id && !parsedPartialIds.includes(p._id)) {
-            parsedPartialIds.push(p._id);
-            parsedPartial.push(p);
-          }
-        });
-      });
-
-      // console.log(parsedPartial.length);
-
-      setTodayInventory([...defcons, ...parsedPartial]);
-
-      if (!currentVehicleData[0]) {
-        setCurrentVehicleData([...defcons, ...dangers, ...warnings, ...readys]);
-      }
+      setCurrentVehicleData([...defcons, ...dangers, ...warnings, ...readys]);
 
       //
       setInventoryLoaded(true);
