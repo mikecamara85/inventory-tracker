@@ -76,7 +76,8 @@ function Main() {
         setTodayInventory,
         setCurrentVehicleData,
         setInventoryLoaded,
-        setVehicleData
+        setVehicleData,
+        vehicleData
       );
     }
     // eslint-disable-next-line
@@ -91,7 +92,8 @@ function Main() {
       setTodayInventory,
       setCurrentVehicleData,
       setInventoryLoaded,
-      setVehicleData
+      setVehicleData,
+      vehicleData
     );
   };
   //
@@ -703,6 +705,7 @@ function Main() {
           <div className=" d-flex flex-row justify-content-center align-items-center flex-wrap">
             <button
               className="m-3 current-filter"
+              id="view-all-filter"
               ref={viewAllFilter}
               onClick={() => {
                 const cur = document.querySelector(".current-filter");
@@ -718,6 +721,7 @@ function Main() {
             <button
               className="m-3"
               ref={checkTodayFilter}
+              id="check-today-filter"
               onClick={() => {
                 const cur = document.querySelector(".current-filter");
                 cur.classList.remove("current-filter");
@@ -732,6 +736,7 @@ function Main() {
             <button
               className="m-3"
               ref={needsServiceFilter}
+              id="needs-service-filter"
               onClick={() => {
                 const cur = document.querySelector(".current-filter");
                 cur.classList.remove("current-filter");
@@ -754,6 +759,7 @@ function Main() {
             <button
               className="m-3"
               ref={needsPhotosFilter}
+              id="needs-photos-filter"
               onClick={() => {
                 const cur = document.querySelector(".current-filter");
                 cur.classList.remove("current-filter");
@@ -776,6 +782,7 @@ function Main() {
             <button
               className="m-3"
               ref={needsDescriptionFilter}
+              id="needs-description-filter"
               onClick={() => {
                 const cur = document.querySelector(".current-filter");
                 cur.classList.remove("current-filter");

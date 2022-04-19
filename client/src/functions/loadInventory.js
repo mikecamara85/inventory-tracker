@@ -190,10 +190,19 @@ export const loadInventory = async (
     const today = [];
 
     fullInventory.forEach((v) => {
-      if (new Date(v.updatedAt).getTime() > new Date().getTime - 43500000) {
+      if (v.model === "Explorer") {
+        console.log(
+          new Date(v.updatedAt).getTime(),
+          new Date().getTime() - 43500000,
+          new Date(v.updatedAt).getTime() > new Date().getTime() - 43500000
+        );
+      }
+      if (new Date(v.updatedAt).getTime() > new Date().getTime() - 43500000) {
         today.push(v);
       }
     });
+
+    // console.log(today.length);
 
     fullInventory.sort((a, b) => {
       if (new Date(a.updatedAt).getTime() > new Date(b.updatedAt).getTime()) {
@@ -221,7 +230,55 @@ export const loadInventory = async (
 
     setTodayInventory(viewToday);
 
-    setCurrentVehicleData([...defcons, ...dangers, ...warnings, ...readys]);
+    const elementWithCurrentFilter = document.querySelector(".current-filter");
+
+    switch (elementWithCurrentFilter.id) {
+      case "view-all-filter":
+        setCurrentVehicleData([...defcons, ...dangers, ...warnings, ...readys]);
+        break;
+      case "check-today-filter":
+        setCurrentVehicleData(viewToday);
+        break;
+      case "needs-service-filter":
+        // vehicleData
+        const needsServiceVehicles = [];
+
+        [...defcons, ...dangers, ...warnings, ...readys].forEach((v) => {
+          if (v.service === "not-done") {
+            needsServiceVehicles.push(v);
+          }
+        });
+
+        setCurrentVehicleData([...needsServiceVehicles]);
+        break;
+      case "needs-photos-filter":
+        // vehicleData
+        const needsPhotosVehicles = [];
+
+        [...defcons, ...dangers, ...warnings, ...readys].forEach((v) => {
+          if (v.photos === "not-done") {
+            needsPhotosVehicles.push(v);
+          }
+        });
+
+        setCurrentVehicleData([...needsPhotosVehicles]);
+        break;
+      case "needs-description-filter":
+        // vehicleData
+        const needsDescriptionVehicles = [];
+
+        [...defcons, ...dangers, ...warnings, ...readys].forEach((v) => {
+          if (v.description === "not-done") {
+            needsDescriptionVehicles.push(v);
+          }
+        });
+
+        setCurrentVehicleData([...needsDescriptionVehicles]);
+        break;
+
+      default:
+        break;
+    }
 
     //
     setInventoryLoaded(true);
