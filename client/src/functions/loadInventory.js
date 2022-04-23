@@ -89,15 +89,14 @@ export const loadInventory = async (
       }
     });
 
+    console.log(photosNoDescr);
+
     const currentStocks = [
       "1554",
-      "2037",
       "2093",
       "2100",
-      "2105",
       "2106",
       "2109",
-      "2111",
       "2112",
       "2113",
       "2116",
@@ -113,15 +112,11 @@ export const loadInventory = async (
       "f1314",
       "f1320",
       "f1323",
-      "f1324",
       "f1328",
-      "f1330",
       "f1333",
       "f1340",
       "f1341",
-      "f1342",
       "f1343",
-      "f1344",
       "f1347m",
       "f1348j",
       "f1349",
@@ -147,8 +142,10 @@ export const loadInventory = async (
       "f1377",
       "f1378",
       "f1379",
-      "f1380",
       "f1381",
+      "f1382",
+      "f1384",
+      "f1385",
     ];
 
     const fullInventory = [...defcons, ...dangers, ...warnings, ...readys];
