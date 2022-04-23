@@ -812,6 +812,17 @@ function Main() {
             <p>Count:&nbsp;</p>
             <p>{currentVehicleData && currentVehicleData.length}</p>
           </div>
+
+          {checkTodayFilter &&
+            checkTodayFilter.current &&
+            Array.from(checkTodayFilter.current.classList).includes(
+              "current-filter"
+            ) && (
+              <div className="full-width d-flex justify-content-center align-items-center medium-text">
+                <p>Suggested:</p>
+              </div>
+            )}
+
           {currentVehicleData.map((v, idx) => {
             return (
               <div key={idx}>

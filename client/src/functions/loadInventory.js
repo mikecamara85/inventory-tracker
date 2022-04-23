@@ -1,5 +1,4 @@
 import axios from "axios";
-import { fi } from "date-fns/locale";
 import { axiosConfig } from "../util/axiosConfig";
 
 export const loadInventory = async (
@@ -89,7 +88,7 @@ export const loadInventory = async (
       }
     });
 
-    console.log(photosNoDescr);
+    photosNoDescr.forEach((v) => console.log(v.stock));
 
     const currentStocks = [
       "1554",
@@ -102,7 +101,6 @@ export const loadInventory = async (
       "2116",
       "f1159",
       "f1261",
-      "f1274",
       "f1286",
       "f1292",
       "f1299",
@@ -136,7 +134,6 @@ export const loadInventory = async (
       "f1371",
       "f1372",
       "f1373",
-      "f1374",
       "f1375",
       "f1376",
       "f1377",
@@ -144,6 +141,7 @@ export const loadInventory = async (
       "f1379",
       "f1381",
       "f1382",
+      "f1383",
       "f1384",
       "f1385",
     ];
