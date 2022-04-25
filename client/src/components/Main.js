@@ -814,16 +814,20 @@ function Main() {
           </div>
 
           {currentVehicleData &&
-            currentVehicleData.length &&
-            checkTodayFilter &&
-            checkTodayFilter.current &&
-            Array.from(checkTodayFilter.current.classList).includes(
-              "current-filter"
-            ) && (
-              <div className="full-width d-flex justify-content-center align-items-center medium-text">
-                <p>Suggested:</p>
-              </div>
-            )}
+          currentVehicleData.length &&
+          checkTodayFilter &&
+          checkTodayFilter.current &&
+          Array.from(checkTodayFilter.current.classList).includes(
+            "current-filter"
+          ) ? (
+            <div className="full-width d-flex justify-content-center align-items-center medium-text">
+              <p>Suggested:</p>
+            </div>
+          ) : (
+            <div className="full-width d-flex justify-content-center align-items-center medium-text">
+              <p>&nbsp;</p>
+            </div>
+          )}
 
           {currentVehicleData.map((v, idx) => {
             return (
