@@ -813,7 +813,9 @@ function Main() {
             <p>{currentVehicleData && currentVehicleData.length}</p>
           </div>
 
-          {checkTodayFilter &&
+          {currentVehicleData &&
+            currentVehicleData.length &&
+            checkTodayFilter &&
             checkTodayFilter.current &&
             Array.from(checkTodayFilter.current.classList).includes(
               "current-filter"
