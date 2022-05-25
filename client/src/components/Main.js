@@ -4,6 +4,8 @@ import axios from "axios";
 import axiosConfig from "../util/axiosConfig";
 import { checkAuthenticated } from "../functions/authFunctions";
 import { format } from "date-fns";
+import AddInventory from "./AddInventory";
+import { loadInventory } from "../functions/loadInventory";
 
 function Main() {
   const navigate = useNavigate();
@@ -42,7 +44,13 @@ function Main() {
     }
 
     if (!inventoryLoaded) {
-      loadInventory();
+      loadInventory(
+        setTodayInventory,
+        setCurrentVehicleData,
+        setInventoryLoaded,
+        setVehicleData,
+        vehicleData
+      );
     }
     // eslint-disable-next-line
   }, [inventoryLoaded]);
@@ -52,93 +60,17 @@ function Main() {
     selectedModule.current.classList.add("hidden");
     mainGridRef.current.classList.remove("hidden");
 
-    (async function () {
-      console.log("loading inventory");
-      const res = await axios.post(
-        "/api/v1/vehicle/get-vehicle-data",
-        {},
-        axiosConfig
-      );
-
-      if (!res || !res.data || !res.data.success) {
-        throw new Error("could not get vehicle data from database");
-      }
-
-      const localVehicleData = res.data.vehicleData;
-
-      localVehicleData.forEach((v, index) => {
-        if (v.bodyShop === "not-done" || v.service === "not-done") {
-          v["severity"] = "danger";
-        } else if (
-          v.detail === "not-done" ||
-          v.photos === "not-done" ||
-          v.description === "not-done" ||
-          v.stickers === "not-done" ||
-          v.priceTag === "not-done"
-        ) {
-          v["severity"] = "warning";
-        } else {
-          v["severity"] = "ready";
-        }
-
-        if (v.severity !== "ready" && v.isSold) {
-          if (
-            v.bodyShop === "not-done" ||
-            v.service === "not-done" ||
-            v.detail === "not-done"
-          ) {
-            v["severity"] = "defcon";
-          }
-        }
-      });
-
-      const defcons = [];
-      const dangers = [];
-      const warnings = [];
-      const readys = [];
-
-      localVehicleData.forEach((v) => {
-        if (v.severity === "defcon") {
-          defcons.push(v);
-        }
-      });
-
-      localVehicleData.forEach((v) => {
-        if (v.severity === "danger") {
-          dangers.push(v);
-        }
-      });
-
-      localVehicleData.forEach((v) => {
-        if (v.severity === "warning") {
-          warnings.push(v);
-        }
-      });
-
-      localVehicleData.forEach((v) => {
-        if (v.severity === "ready") {
-          readys.push(v);
-        }
-      });
-
-      setTodayInventory([...defcons, ...dangers, ...warnings, ...readys]);
-
-      setCurrentVehicleData([...defcons, ...dangers, ...warnings, ...readys]);
-
-      //
-      setInventoryLoaded(true);
-    })();
+    loadInventory(
+      setTodayInventory,
+      setCurrentVehicleData,
+      setInventoryLoaded,
+      setVehicleData,
+      vehicleData
+    );
   };
   //
-  const loadInventory = async () => {
-    try {
-      console.log("loading inventory");
-      const res = await axios.post(
-        "/api/v1/vehicle/get-vehicle-data",
-        {},
-        axiosConfig
-      );
 
+<<<<<<< HEAD
       if (!res || !res.data || !res.data.success) {
         throw new Error("could not get vehicle data from database");
       }
@@ -228,6 +160,8 @@ function Main() {
       console.log(error.message);
     }
   };
+=======
+>>>>>>> 3fe1de26c9b16ca3afab010ac21d3da0863159b3
   //
   const selector = (e) => {
     selectedModule.current.classList.remove("hidden");
@@ -729,6 +663,7 @@ function Main() {
           <div className=" d-flex flex-row justify-content-center align-items-center flex-wrap">
             <button
               className="m-3 current-filter"
+              id="view-all-filter"
               ref={viewAllFilter}
               onClick={() => {
                 const cur = document.querySelector(".current-filter");
@@ -744,6 +679,7 @@ function Main() {
             <button
               className="m-3"
               ref={checkTodayFilter}
+              id="check-today-filter"
               onClick={() => {
                 const cur = document.querySelector(".current-filter");
                 cur.classList.remove("current-filter");
@@ -758,6 +694,7 @@ function Main() {
             <button
               className="m-3"
               ref={needsServiceFilter}
+              id="needs-service-filter"
               onClick={() => {
                 const cur = document.querySelector(".current-filter");
                 cur.classList.remove("current-filter");
@@ -780,6 +717,7 @@ function Main() {
             <button
               className="m-3"
               ref={needsPhotosFilter}
+              id="needs-photos-filter"
               onClick={() => {
                 const cur = document.querySelector(".current-filter");
                 cur.classList.remove("current-filter");
@@ -802,6 +740,7 @@ function Main() {
             <button
               className="m-3"
               ref={needsDescriptionFilter}
+              id="needs-description-filter"
               onClick={() => {
                 const cur = document.querySelector(".current-filter");
                 cur.classList.remove("current-filter");
@@ -831,6 +770,23 @@ function Main() {
             <p>Count:&nbsp;</p>
             <p>{currentVehicleData && currentVehicleData.length}</p>
           </div>
+
+          {currentVehicleData &&
+          currentVehicleData.length &&
+          checkTodayFilter &&
+          checkTodayFilter.current &&
+          Array.from(checkTodayFilter.current.classList).includes(
+            "current-filter"
+          ) ? (
+            <div className="full-width d-flex justify-content-center align-items-center medium-text">
+              <p>Suggested:</p>
+            </div>
+          ) : (
+            <div className="full-width d-flex justify-content-center align-items-center medium-text">
+              <p>&nbsp;</p>
+            </div>
+          )}
+
           {currentVehicleData.map((v, idx) => {
             return (
               <div key={idx}>
@@ -924,6 +880,42 @@ function Main() {
           </button>
         </div>
       </div>
+<<<<<<< HEAD
+=======
+
+      <AddInventory
+        yearInput={yearInput}
+        enteredYear={enteredYear}
+        updateEntered={updateEntered}
+        makeInput={makeInput}
+        enteredMake={enteredMake}
+        modelInput={modelInput}
+        enteredModel={enteredModel}
+        stockInput={stockInput}
+        enteredStock={enteredStock}
+        bodyShopInput={bodyShopInput}
+        enteredBodyShop={enteredBodyShop}
+        serviceInput={serviceInput}
+        enteredService={enteredService}
+        techInput={techInput}
+        enteredTech={enteredTech}
+        detailInput={detailInput}
+        enteredDetail={enteredDetail}
+        photosInput={photosInput}
+        enteredPhotos={enteredPhotos}
+        descriptionInput={descriptionInput}
+        enteredDescription={enteredDescription}
+        gasInput={gasInput}
+        enteredGas={enteredGas}
+        stickersInput={stickersInput}
+        enteredStickers={enteredStickers}
+        priceTagInput={priceTagInput}
+        enteredPriceTag={enteredPriceTag}
+        isSoldInput={isSoldInput}
+        enteredIsSold={enteredIsSold}
+        mainGridParent={mainGridParent}
+      ></AddInventory>
+>>>>>>> 3fe1de26c9b16ca3afab010ac21d3da0863159b3
     </div>
   );
 }
