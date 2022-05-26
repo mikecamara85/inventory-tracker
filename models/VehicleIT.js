@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const vehicleSchema = mongoose.Schema(
+const vehicleITSchema = mongoose.Schema(
   {
     dealership: {
       type: mongoose.Schema.Types.ObjectId,
@@ -18,6 +18,17 @@ const vehicleSchema = mongoose.Schema(
       type: String,
       required: [true, "A vehicle must have a model!"],
     },
+    vin: String,
+    publicPrice: String,
+    trim: {
+      type: String,
+    },
+    mileage: {
+      type: String,
+    },
+    exteriorColor: String,
+    interiorColor: String,
+    options: String,
     stock: {
       type: String,
       required: [true, "A vehicle must have a stock number!"],
@@ -47,6 +58,7 @@ const vehicleSchema = mongoose.Schema(
       type: String,
       default: "not-done",
     },
+    transmission: String,
     gas: {
       type: Date,
       default: null,
@@ -78,6 +90,7 @@ const vehicleSchema = mongoose.Schema(
         },
       ],
     },
+    pictures: Array,
     lastAccessed: {
       type: Date,
       default: new Date(),
@@ -88,6 +101,6 @@ const vehicleSchema = mongoose.Schema(
 
 // need a middleware here that will populate the correct users on save
 
-const Vehicle = mongoose.model("Vehicle", vehicleSchema);
+const VehicleIT = mongoose.model("VehicleIT", vehicleITSchema);
 
-module.exports = Vehicle;
+module.exports = VehicleIT;

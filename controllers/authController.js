@@ -39,53 +39,60 @@ exports.createSendToken = (user, statusCode, req, res) => {
 };
 
 exports.login = async (req, res, next) => {
-  const { username, password } = req.body;
+  try {
+    const { username, password } = req.body;
 
-  // console.log("received: ", username);
+    // console.log("received: ", username);
 
-  // 2: Check if email and password exist
+    // 2: Check if email and password exist
 
-  if (!username || !password) {
-    throw new Error("username and/or password not found");
-  }
+    if (!username || !password) {
+      throw new Error("username and/or password not found");
+    }
 
-  // 3: Check if the user exists, password is correct, and get user phone number
-  // come back to this and implement security for consecutive failed login attempts
+    // 3: Check if the user exists, password is correct, and get user phone number
+    // come back to this and implement security for consecutive failed login attempts
 
-  const user = await User.findOne({ username: username })
-    .select("password")
-    .select("username")
-    .select("dealership")
-    .catch((err, result) => {
-      if (err) {
-        throw new Error(`could not find username ${username} in database`);
-      } else {
-        return result;
+    const user = await User.findOne({ username: username })
+      .select("password")
+      .select("username")
+      .select("dealership")
+      .catch((err, result) => {
+        if (err) {
+          throw new Error(`could not find username ${username} in database`);
+        } else {
+          return result;
+        }
+      });
+
+    if (!user) {
+      throw new Error(`could not find username ${username} in database`);
+    }
+
+    const correctPassword = await user.correctPassword(password, user.password);
+
+    if (!correctPassword) {
+      throw new Error(`password ${password} is incorrect...`);
+    } else {
+      // console.log(user);
+
+      const dealership = await Dealership.findById(user.dealership);
+
+      if (!dealership) {
+        throw new Error("dealership of this user does not exist");
       }
+
+      if (!dealership.users.includes(user._id)) {
+        throw new Error("this user does not belong to this dealership");
+      }
+
+      this.createSendToken(user, 200, req, res);
+    }
+  } catch (error) {
+    console.log(error.message);
+    res.status(400).send({
+      success: false,
     });
-
-  if (!user) {
-    throw new Error(`could not find username ${username} in database`);
-  }
-
-  const correctPassword = await user.correctPassword(password, user.password);
-
-  if (!correctPassword) {
-    throw new Error(`password ${password} is incorrect...`);
-  } else {
-    // console.log(user);
-
-    const dealership = await Dealership.findById(user.dealership);
-
-    if (!dealership) {
-      throw new Error("dealership of this user does not exist");
-    }
-
-    if (!dealership.users.includes(user._id)) {
-      throw new Error("this user does not belong to this dealership");
-    }
-
-    this.createSendToken(user, 200, req, res);
   }
 };
 
@@ -98,8 +105,10 @@ exports.checkJWT = async (req, res, next) => {
       req.headers.authorization &&
       req.headers.authorization.startsWith("Bearer")
     ) {
+      // console.log("found in auth headers");
       token = req.headers.authorization.split(" ")[1];
     } else if (req.cookies.jwt) {
+      // console.log("found in cookies");
       token = req.cookies.jwt;
     }
 

@@ -1,5 +1,5 @@
 const User = require("../models/User");
-const Vehicle = require("../models/Vehicle");
+const VehicleIT = require("../models/VehicleIT");
 
 exports.deleteVehicle = async (req, res, next) => {
   try {
@@ -9,7 +9,7 @@ exports.deleteVehicle = async (req, res, next) => {
     }
 
     // here, the req is also going to have to contain the dealership and the user
-    const vehicle = await Vehicle.find({ stock: req.body.answer });
+    const vehicle = await VehicleIT.find({ stock: req.body.answer });
 
     if (!vehicle[0]) {
       console.log("not found in database");
@@ -20,7 +20,7 @@ exports.deleteVehicle = async (req, res, next) => {
       );
     } else {
       console.log("found in database");
-      const deleted = await Vehicle.findByIdAndDelete(vehicle[0]._id);
+      const deleted = await VehicleIT.findByIdAndDelete(vehicle[0]._id);
 
       if (deleted) {
         res.status(200).send({
@@ -47,7 +47,7 @@ exports.enterVehicle = async (req, res, next) => {
 
     const user = await User.findById(req.body.userId);
 
-    await Vehicle.create({
+    await VehicleIT.create({
       year: receivedVehicle.enteredYear,
       make: receivedVehicle.enteredMake,
       model: receivedVehicle.enteredModel,
@@ -88,7 +88,7 @@ exports.enterVehicle = async (req, res, next) => {
 //
 exports.getVehicleData = async (req, res, next) => {
   try {
-    const vehicleData = await Vehicle.find();
+    const vehicleData = await VehicleIT.find();
 
     res.status(200).send({
       success: true,
@@ -118,7 +118,7 @@ exports.updateVehicle = async (req, res, next) => {
     }
 
     if (req.body.bodyShop) {
-      await Vehicle.findByIdAndUpdate(req.body.currentVehicle._id, {
+      await VehicleIT.findByIdAndUpdate(req.body.currentVehicle._id, {
         lastAccessed: new Date(),
         bodyShop: req.body.bodyShop,
         notes: [
@@ -132,7 +132,7 @@ exports.updateVehicle = async (req, res, next) => {
         ],
       });
     } else if (req.body.service) {
-      await Vehicle.findByIdAndUpdate(req.body.currentVehicle._id, {
+      await VehicleIT.findByIdAndUpdate(req.body.currentVehicle._id, {
         lastAccessed: new Date(),
         service: req.body.service,
         notes: [
@@ -146,7 +146,7 @@ exports.updateVehicle = async (req, res, next) => {
         ],
       });
     } else if (req.body.tech) {
-      await Vehicle.findByIdAndUpdate(req.body.currentVehicle._id, {
+      await VehicleIT.findByIdAndUpdate(req.body.currentVehicle._id, {
         lastAccessed: new Date(),
         tech: req.body.tech,
         notes: [
@@ -160,7 +160,7 @@ exports.updateVehicle = async (req, res, next) => {
         ],
       });
     } else if (req.body.detail) {
-      await Vehicle.findByIdAndUpdate(req.body.currentVehicle._id, {
+      await VehicleIT.findByIdAndUpdate(req.body.currentVehicle._id, {
         lastAccessed: new Date(),
         detail: req.body.detail,
         notes: [
@@ -174,7 +174,7 @@ exports.updateVehicle = async (req, res, next) => {
         ],
       });
     } else if (req.body.photos) {
-      await Vehicle.findByIdAndUpdate(req.body.currentVehicle._id, {
+      await VehicleIT.findByIdAndUpdate(req.body.currentVehicle._id, {
         lastAccessed: new Date(),
         photos: req.body.photos,
         notes: [
@@ -188,7 +188,7 @@ exports.updateVehicle = async (req, res, next) => {
         ],
       });
     } else if (req.body.description) {
-      await Vehicle.findByIdAndUpdate(req.body.currentVehicle._id, {
+      await VehicleIT.findByIdAndUpdate(req.body.currentVehicle._id, {
         lastAccessed: new Date(),
         description: req.body.description,
         notes: [
@@ -202,7 +202,7 @@ exports.updateVehicle = async (req, res, next) => {
         ],
       });
     } else if (req.body.gas) {
-      await Vehicle.findByIdAndUpdate(req.body.currentVehicle._id, {
+      await VehicleIT.findByIdAndUpdate(req.body.currentVehicle._id, {
         lastAccessed: new Date(),
         gas: new Date(),
         notes: [
@@ -216,7 +216,7 @@ exports.updateVehicle = async (req, res, next) => {
         ],
       });
     } else if (req.body.stickers) {
-      await Vehicle.findByIdAndUpdate(req.body.currentVehicle._id, {
+      await VehicleIT.findByIdAndUpdate(req.body.currentVehicle._id, {
         lastAccessed: new Date(),
         stickers: req.body.stickers,
         notes: [
@@ -230,7 +230,7 @@ exports.updateVehicle = async (req, res, next) => {
         ],
       });
     } else if (req.body.priceTag) {
-      await Vehicle.findByIdAndUpdate(req.body.currentVehicle._id, {
+      await VehicleIT.findByIdAndUpdate(req.body.currentVehicle._id, {
         lastAccessed: new Date(),
         priceTag: req.body.priceTag,
         notes: [
@@ -244,7 +244,7 @@ exports.updateVehicle = async (req, res, next) => {
         ],
       });
     } else if (req.body.isSold) {
-      await Vehicle.findByIdAndUpdate(req.body.currentVehicle._id, {
+      await VehicleIT.findByIdAndUpdate(req.body.currentVehicle._id, {
         lastAccessed: new Date(),
         isSold: req.body.isSold,
         notes: [
@@ -258,7 +258,7 @@ exports.updateVehicle = async (req, res, next) => {
         ],
       });
     } else if (req.body.noteBody) {
-      await Vehicle.findByIdAndUpdate(req.body.currentVehicle._id, {
+      await VehicleIT.findByIdAndUpdate(req.body.currentVehicle._id, {
         lastAccessed: new Date(),
         notes: [
           ...req.body.currentVehicle.notes,
@@ -272,7 +272,9 @@ exports.updateVehicle = async (req, res, next) => {
       });
     }
 
-    const updatedVehicle = await Vehicle.findById(req.body.currentVehicle._id);
+    const updatedVehicle = await VehicleIT.findById(
+      req.body.currentVehicle._id
+    );
 
     res.status(200).send({
       success: true,
