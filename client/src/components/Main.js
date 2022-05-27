@@ -28,9 +28,10 @@ function Main() {
       try {
         const authSuccess = await checkAuthenticated();
 
-        // console.log(authSuccess);
+        console.log(authSuccess);
 
         if (!authSuccess) {
+          navigate("/");
         }
       } catch (error) {
         console.log(error.message);
