@@ -50,10 +50,6 @@ const vehicleITSchema = mongoose.Schema(
       type: String,
       default: "not-done",
     },
-    photos: {
-      type: String,
-      default: "not-done",
-    },
     description: {
       type: String,
       default: "not-done",

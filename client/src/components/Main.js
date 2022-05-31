@@ -47,7 +47,13 @@ function Main() {
   }, [inventoryLoaded]);
   //
   const showSelectedVehicle = (e) => {
-    // some function
+    // console.log(e.currentTarget.id);
+    vehicleData &&
+      vehicleData.forEach((v) => {
+        if (v._id.toString() === e.currentTarget.id) {
+          console.log(v);
+        }
+      });
   };
   //
   return (
@@ -78,7 +84,6 @@ function Main() {
             >
               View All
             </button>
-
             <button
               className="m-3"
               ref={checkTodayFilter}
@@ -86,7 +91,6 @@ function Main() {
             >
               Check Today
             </button>
-
             <button
               className="m-3"
               ref={needsServiceFilter}
@@ -123,7 +127,7 @@ function Main() {
                 const needsPhotosVehicles = [];
 
                 vehicleData.forEach((v) => {
-                  if (v.photos === "not-done") {
+                  if (v.pictures.length < 2) {
                     needsPhotosVehicles.push(v);
                   }
                 });
@@ -146,7 +150,12 @@ function Main() {
                 const needsDescriptionVehicles = [];
 
                 vehicleData.forEach((v) => {
-                  if (v.description === "not-done") {
+                  if (
+                    v.description === "" &&
+                    v.pictures &&
+                    v.pictures.length > 1
+                  ) {
+                    // console.log(v);
                     needsDescriptionVehicles.push(v);
                   }
                 });
@@ -189,10 +198,10 @@ function Main() {
                 {v.severity === "defcon" && (
                   <div
                     key={idx}
+                    id={v._id}
                     className="small-medium-text expanding-module expanding-module-defcon  d-flex align-items-center justify-content-center"
                     onClick={(e) => {
                       setSelectedVehicle(v);
-
                       showSelectedVehicle(e);
                     }}
                   >
@@ -203,6 +212,7 @@ function Main() {
                 {v.severity === "danger" && (
                   <div
                     key={idx}
+                    id={v._id}
                     className="small-medium-text expanding-module expanding-module-danger  d-flex align-items-center justify-content-center"
                     onClick={(e) => {
                       setSelectedVehicle(v);
@@ -216,6 +226,7 @@ function Main() {
                 {v.severity === "warning" && (
                   <div
                     key={idx}
+                    id={v._id}
                     className="small-medium-text expanding-module expanding-module-warning  d-flex align-items-center justify-content-center"
                     onClick={(e) => {
                       setSelectedVehicle(v);
@@ -229,6 +240,7 @@ function Main() {
                 {v.severity === "ready" && (
                   <div
                     key={idx}
+                    id={v._id}
                     className="small-medium-text expanding-module expanding-module-ready  d-flex align-items-center justify-content-center"
                     onClick={(e) => {
                       setSelectedVehicle(v);
