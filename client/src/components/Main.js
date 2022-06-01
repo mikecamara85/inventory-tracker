@@ -16,9 +16,10 @@ function Main() {
   const needsPhotosFilter = useRef();
   const mainGridRef = useRef();
   const needsDescriptionFilter = useRef();
+  const vehicleViewer = useRef();
   //
   const [inventoryLoaded, setInventoryLoaded] = useState(false);
-  const [selectedVehicle, setSelectedVehicle] = useState({});
+  const [selectedVehicle, setSelectedVehicle] = useState(null);
   const [currentVehicleData, setCurrentVehicleData] = useState([]);
   const [vehicleData, setVehicleData] = useState({});
   //
@@ -40,7 +41,12 @@ function Main() {
     })();
     if (!inventoryLoaded) {
       // showtime...
-      loadInventory(setInventoryLoaded, setVehicleData);
+      loadInventory(
+        setInventoryLoaded,
+        setVehicleData,
+        currentVehicleData,
+        setCurrentVehicleData
+      );
     }
 
     // eslint-disable-next-line
@@ -51,7 +57,14 @@ function Main() {
     vehicleData &&
       vehicleData.forEach((v) => {
         if (v._id.toString() === e.currentTarget.id) {
-          console.log(v);
+          console.log("selectedVehicle: ", v);
+          mainGridParent.current.classList.add("hidden");
+
+          (async function () {
+            setSelectedVehicle(v);
+          })().then(() => {
+            vehicleViewer.current.classList.remove("hidden");
+          });
         }
       });
   };
@@ -90,29 +103,6 @@ function Main() {
               id="check-today-filter"
             >
               Check Today
-            </button>
-            <button
-              className="m-3"
-              ref={needsServiceFilter}
-              id="needs-service-filter"
-              onClick={() => {
-                const cur = document.querySelector(".current-filter");
-                cur.classList.remove("current-filter");
-                needsServiceFilter.current.classList.add("current-filter");
-
-                // vehicleData
-                const needsServiceVehicles = [];
-
-                vehicleData.forEach((v) => {
-                  if (v.service === "not-done") {
-                    needsServiceVehicles.push(v);
-                  }
-                });
-
-                setCurrentVehicleData([...needsServiceVehicles]);
-              }}
-            >
-              Needs Service
             </button>
             <button
               className="m-3"
@@ -288,6 +278,25 @@ function Main() {
           </button>
         </div>
       </div>
+
+      {selectedVehicle && (
+        <div
+          ref={vehicleViewer}
+          className="d-flex flex-column justify-content-center align-items-center hidden"
+        >
+          <span
+            className="large-text m-3 close-button"
+            onClick={(e) => {
+              setSelectedVehicle(null);
+              mainGridParent.current.classList.remove("hidden");
+              vehicleViewer.current.classList.add("hidden");
+            }}
+          >
+            X
+          </span>
+          <h1 className="large-text mb-0">Hello World</h1>
+        </div>
+      )}
     </div>
   );
 }

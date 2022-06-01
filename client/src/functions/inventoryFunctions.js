@@ -1,7 +1,12 @@
 import axios from "axios";
 import { axiosConfig } from "../util/axiosConfig";
 
-export const loadInventory = async (setInventoryLoaded, setVehicleData) => {
+export const loadInventory = async (
+  setInventoryLoaded,
+  setVehicleData,
+  currentVehicleData,
+  setCurrentVehicleData
+) => {
   try {
     const res = await axios.post(
       "/api/v1/vehicle/get-vehicle-data",
@@ -39,6 +44,9 @@ export const loadInventory = async (setInventoryLoaded, setVehicleData) => {
       });
 
       setVehicleData(res.data.vehicleData);
+      if (currentVehicleData.length === 0) {
+        setCurrentVehicleData(res.data.vehicleData);
+      }
 
       // console.log(res.data.vehicleData);
 

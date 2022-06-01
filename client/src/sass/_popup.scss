@@ -15,3 +15,17 @@
   max-width: 225px;
   width: 100%;
 }
+
+.close-button {
+  cursor: pointer;
+  text-align: center;
+  height: 50px;
+  width: 50px;
+  border: 2px solid black;
+  border-radius: 25px;
+
+  &:hover {
+    color: red;
+    border: 2px solid red;
+  }
+}
