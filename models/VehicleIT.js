@@ -87,6 +87,10 @@ const vehicleITSchema = mongoose.Schema(
       ],
     },
     pictures: Array,
+    entryDate: Date,
+    driveType: String,
+    engine: String,
+    bodyType: String,
     lastAccessed: {
       type: Date,
       default: new Date(),

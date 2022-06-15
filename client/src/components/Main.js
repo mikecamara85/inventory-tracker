@@ -29,7 +29,7 @@ function Main() {
       try {
         const authSuccess = await checkAuthenticated();
 
-        console.log(authSuccess);
+        // console.log(authSuccess);
 
         if (!authSuccess) {
           navigate("/");
@@ -117,7 +117,7 @@ function Main() {
                 const needsPhotosVehicles = [];
 
                 vehicleData.forEach((v) => {
-                  if (v.pictures.length < 2) {
+                  if (v.pictures.length < 5) {
                     needsPhotosVehicles.push(v);
                   }
                 });
@@ -285,7 +285,7 @@ function Main() {
           className="d-flex flex-column justify-content-center align-items-center hidden"
         >
           <span
-            className="large-text m-3 close-button"
+            className="large-text m-5 close-button"
             onClick={(e) => {
               setSelectedVehicle(null);
               mainGridParent.current.classList.remove("hidden");
@@ -294,7 +294,15 @@ function Main() {
           >
             X
           </span>
-          <h1 className="large-text mb-0">Hello World</h1>
+          <div className="car-heading large-text mt-0 mb-5">
+            {selectedVehicle.year} {selectedVehicle.make}{" "}
+            {selectedVehicle.model} {selectedVehicle.trim}
+          </div>
+          {selectedVehicle.pictures[0] && selectedVehicle.pictures[0] !== "" ? (
+            <img src={selectedVehicle.pictures[0]} className="car-photo"></img>
+          ) : (
+            <div className="large-text m-5">No pictures!</div>
+          )}
         </div>
       )}
     </div>
